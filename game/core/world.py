@@ -1,0 +1,130 @@
+# world.py
+from ..utils.helpers import draw_guide
+from ..utils.config import *
+from .clock import Clock
+from .resources import ResourceManager
+from ..environment.season import Season
+from ..environment.disaster import DisasterManager
+from ..systems.tech_tree import TechTree
+from ..entities.biological.plant import Plant
+from ..entities.biological.animal_species import Rabbit, Crocodile
+from ..entities.items.item import CraftingSystem
+
+class World:
+
+    def __init__(self, width, height, test_state=0, initial_speed=1, speeds=[1, 2, 4]):
+        # 基础状态
+        self.width = width
+        self.height = height
+        self.pause = False
+        self.end = False
+        self.ending1 = False
+        self.ending2 = False
+        self.ending3 = False
+
+        self.last_pause = None
+        self.guide_visible = False
+        self.guide_rect = None
+        self.last_pause_guide = None
+
+        # 配置和系统初始化（时间、季节、灾害、资源）
+        self.clock = Clock(initial_speed, speeds)
+        self.season_config = SeasonConfig()
+        Season.config = self.season_config
+        self.season = Season()
+        self.disaster = DisasterManager()
+        self.resource_manager = ResourceManager(test=test_state)
+
+        # 配置和实体（兔子、鳄鱼、植物）
+        self.dead_animals = []
+
+        self.rabbit_config = RabbitConfig()
+        Rabbit.config = self.rabbit_config
+        self.rabbits = Rabbit.initialize_animals(self.rabbit_config)
+
+        self.croc_config = CrocodileConfig()
+        Crocodile.config = self.croc_config
+        self.crocodiles = Crocodile.initialize_animals(self.croc_config)
+
+        self.plant_config = PlantConfig()
+        Plant.config = self.plant_config
+        self.plants = Plant.initialize_plants(self.plant_config.initial_num)
+
+        # 科技树和道具系统
+        self.tech_tree = TechTree(self.resource_manager, self.width, self.height)
+        self.crafting_system = CraftingSystem(self, self.width, self.height)
+
+    @property
+    def animals(self):
+        """获取所有动物"""
+        return self.rabbits + self.crocodiles
+
+    def can_update(self):
+        """检测是否结束"""
+        return not self.end
+
+    def can_progress(self):
+        """检测是否暂停"""
+        return not self.pause and not self.end
+
+    def update_always(self):
+        """始终更新"""
+        self.resource_manager.update_ecopoints(self.clock.speed, self.pause)
+        Plant.add_new_plant(self.plants, self.season, self.resource_manager, self.clock.speed, self.pause)
+        self.season.update(self.clock.speed, self.pause)
+        self.clock.update(self.pause)
+        self.disaster.update(self, self.clock.speed, self.pause)
+        self.crafting_system.update(self.clock.speed, self.pause)
+
+        for animal in self.animals:
+            animal.move(self.animals, self.plants, self.season, self.dead_animals, self.plant_config, self.clock.speed, self.pause)
+
+        Plant.remove_plants_near_animals(self.plants, self.rabbits, self.season, self.resource_manager, self.clock.speed, self.pause)
+
+    def update_when_active(self):
+        """非暂停时更新"""
+        self.rabbits.extend(Rabbit.add_new_animal(self.rabbits, self.rabbit_config, self.resource_manager, self.animals, self.season))
+        self.crocodiles.extend(Crocodile.add_new_animal(self.crocodiles, self.croc_config, self.resource_manager, self.animals, self.season))
+
+        self.rabbits = Rabbit.remove_old_animals(self.rabbits)
+        self.crocodiles = Crocodile.remove_old_animals(self.crocodiles)
+
+        for dead in self.dead_animals:
+            if isinstance(dead, Rabbit) and dead in self.rabbits:
+                self.rabbits.remove(dead)
+        self.dead_animals.clear()
+
+    def check_end(self):
+        """检测结束状态"""
+        if len(self.plants) == 0:
+            self.end = self.ending1 = True
+        elif len(self.rabbits) == 0:
+            self.end = self.ending2 = True
+        elif len(self.crocodiles) == 0:
+            self.end = self.ending3 = True
+
+    def restart(self):
+        """重置世界"""
+        self.__init__(self.width, self.height)
+
+    def draw(self, screen):
+        """绘制世界"""
+        # 绘制建筑、植物、动物
+        if not self.tech_tree.visible:
+            for building in self.tech_tree.buildings.values():
+                building.draw(screen)
+            for plant in self.plants:
+                plant.draw(screen)
+            for animal in self.animals:
+                animal.draw(screen)
+
+        # 绘制科技树、季节、状态、时间、资源、道具
+        self.tech_tree.draw(screen)
+        self.season.draw(screen)
+        self.clock.draw(screen)
+        self.resource_manager.draw(screen)
+        self.disaster.draw(screen, self.clock.speed, self.pause)
+        self.crafting_system.draw(screen)
+
+        if self.guide_visible:
+            draw_guide(screen, self)

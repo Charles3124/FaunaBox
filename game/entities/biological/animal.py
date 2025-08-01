@@ -1,0 +1,127 @@
+# animal.py
+import pygame
+import random
+import math
+from ...utils.config import MapConfig
+
+class Animal:
+    loaded_images = {}
+
+    def __init__(self, x, y, config):
+        # 基本属性
+        self.config = config
+        self.x = x
+        self.y = y
+        self.size = config.size
+
+        if config.image not in Animal.loaded_images:
+            Animal.loaded_images[config.image] = pygame.transform.smoothscale(pygame.image.load(config.image).convert_alpha(),
+                                                                              (self.size[0] * 2, self.size[1] * 2))
+        self.image = Animal.loaded_images[config.image]
+
+        # 速度属性
+        self.ave_speed = config.ave_speed
+        self.range_speed = config.range_speed
+        self.min_speed = self.ave_speed - self.range_speed
+        self.max_speed = self.ave_speed + self.range_speed
+        self.speed = random.uniform(self.min_speed, self.max_speed)
+        self.speed_change_rate = config.speed_change_rate
+
+        # 角度属性
+        self.angle = random.uniform(0, 2 * math.pi)
+        self.angle_change_rate = config.angle_change_rate
+
+        # 年龄属性
+        self.age = 0
+        self.ave_age = config.ave_age
+        self.range_age = config.range_age
+        self.age_random = 60000 * random.uniform(self.ave_age - self.range_age, self.ave_age + self.range_age)
+
+        # 实时变化的属性
+        self.eaten = 0.0
+
+    def draw(self, screen):
+        """绘制动物"""
+        rect = self.image.get_rect(center=(self.x, self.y))
+        screen.blit(self.image, rect)
+
+    @staticmethod
+    def remove_old_animals(animals):
+        """移除动物"""
+        return [animal for animal in animals if animal.age < animal.age_random]
+
+    @classmethod
+    def is_too_close_a(cls, new_animal, animals, config):
+        """控制动物距离"""
+        for animal in animals:
+            distance = ((new_animal.x - animal.x) ** 2 + (new_animal.y - animal.y) ** 2) ** 0.5
+            if distance < config.min_distance:
+                return True
+        return False
+
+    @classmethod
+    def initialize_animals(cls, config):
+        """初始化动物"""
+        animals = []
+        for _ in range(config.initial_num):
+            for _ in range(100):
+                new_x = random.uniform(config.size[0], MapConfig.width - config.size[0])
+                new_y = random.uniform(config.size[1], MapConfig.height - config.size[1])
+                new_animal = cls(new_x, new_y, config)
+                if not cls.is_too_close_a(new_animal, animals, config):
+                    animals.append(new_animal)
+                    break
+        return animals
+
+    @classmethod
+    def add_one_animal(cls, animals, config, all_animals):
+        """加一个动物"""
+        for _ in range(100):
+            new_x = random.uniform(config.size[0], MapConfig.width - config.size[0])
+            new_y = random.uniform(config.size[1], MapConfig.height - config.size[1])
+            new_animal = cls(new_x, new_y, config)
+            if not cls.is_too_close_a(new_animal, all_animals, config):
+                break
+        return new_animal
+
+    @classmethod
+    def add_new_animal(cls, animals, config, resource_manager, all_animals, season):
+        """动物繁殖"""
+        new_animals = []
+        target_eaten = config.reproduction_threshold[season.current]
+
+        for animal in animals:
+            if animal.eaten >= target_eaten:
+                animal.eaten -= target_eaten
+
+                if getattr(animal, 'herbivore', False):
+                    animal.energy = 0
+                
+                for _ in range(100):
+                    new_x = random.uniform(config.size[0], MapConfig.width - config.size[0])
+                    new_y = random.uniform(config.size[1], MapConfig.height - config.size[1])
+                    new_animal = cls(new_x, new_y, config)
+                    if not cls.is_too_close_a(new_animal, all_animals, config):
+                        new_animals.append(new_animal)
+                        resource_manager.gain_animite(config.reproduction_resource)
+                        break
+        return new_animals
+
+    @classmethod
+    def boost_speed(cls, config):
+        """触发动物加速"""
+        config.boosting = True
+
+    def update_basic_stats(self):
+        """更新基础属性"""
+        # 动物速度有变化
+        if self.ave_speed != self.config.ave_speed:
+            self.ave_speed = self.config.ave_speed
+            self.min_speed = self.ave_speed - self.range_speed
+            self.max_speed = self.ave_speed + self.range_speed
+            self.speed = random.uniform(self.min_speed, self.max_speed)
+
+        # 动物年龄有变化
+        if self.ave_age != self.config.ave_age or self.range_age != self.config.range_age:
+            self.ave_age = self.config.ave_age
+            self.range_age = self.config.range_age
