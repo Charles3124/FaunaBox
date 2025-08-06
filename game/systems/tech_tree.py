@@ -87,9 +87,7 @@ class TechTree:
         self.visible = not self.visible
         if self.visible:   # 切换 BGM
             sound_manager.stop_all_bgm()
-            sound_manager.sound_dict['Zen Garden'].play(-1)
         else:
-            sound_manager.sound_dict['Zen Garden'].stop()
             sound_manager.play_random_bgm()
 
     def handle_click(self, pos):

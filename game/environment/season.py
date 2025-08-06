@@ -57,6 +57,7 @@ class Season:
         # 仅在非暂停时累计有效运行时间
         delta_time *= time_speed
         self.active_time += delta_time
+        change = False
 
         # 更新季节
         if self.active_time > Season.config.switch_interval:
@@ -64,6 +65,7 @@ class Season:
             self.index = (self.index + 1) % 4
             self.current = self.SEASONS[self.index]
             self.target_color = self.COLORS[self.current]
+            change = True
         
         # 如果当前为非降雨状态
         if not self.is_raining:
@@ -84,6 +86,7 @@ class Season:
             # 检查是否结束降雨
             if self.rain_duration_timer > self.rain_duration:
                 self.stop_rain()
+        return change
 
     def start_rain(self):
         """开始降雨"""
