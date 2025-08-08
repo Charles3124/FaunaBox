@@ -1,12 +1,18 @@
 # disaster.py
+from __future__ import annotations
 import pygame
 import math
 import random
-from ..utils.config import MapConfig
+from game.utils import MapConfig
+from .season import Season
+
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from game.core import World
 
 class DisasterManager:
 
-    def __init__(self, disaster_interval=20000, font_size=20, font_name="SimSun"):
+    def __init__(self, disaster_interval: int = 20000, font_name: str = "SimSun", font_size: int = 20):
         self.font = pygame.font.SysFont(font_name, font_size)
 
         self.disaster_interval = disaster_interval        # 灾害间隔
@@ -26,43 +32,62 @@ class DisasterManager:
         self.max_disaster_time = 50     # 下一次灾难来袭的最大时间
         self.min_disaster_time = 30     # 下一次灾难来袭的最小时间
 
-        self.disasters = [
-            self.animal_plague
-        ]
+        self.mid_state = None    # 中转状态
+        self.disasters = {
+            "animal_plague": {"func": self.animal_plague, "message": "兔子感染瘟疫！"},
+            "harsh_winter": {"func": self.harsh_winter, "message": "严冬来临！"},
+        }
 
-    def update(self, world, time_speed, pause):
+    def update(self, world: World, season: Season, time_speed: int, pause: bool) -> None:
         """检查是否触发灾害"""
-        # 只有没有灾害时，才检查是否生成灾害，并累计时间
-        if self.current_disaster_text is not None:
-            return
+        # 判断当前是否是中转状态
+        if self.mid_state == "animal_plague":
+            self.start_disaster(world)
+        
+        elif self.mid_state == "harsh_winter":
+            if season.current == "冬天":
+                self.start_disaster(world)
+        
+        else:
+            # 活跃时间检查
+            now = pygame.time.get_ticks()
+            delta_time = now - self.last_update_time
+            self.last_update_time = pygame.time.get_ticks()
+            if pause:
+                return
+            delta_time *= time_speed
+            self.active_time += delta_time
 
-        # 活跃时间检查
-        now = pygame.time.get_ticks()
-        delta_time = now - self.last_update_time
-        self.last_update_time = pygame.time.get_ticks()
-        if pause:
-            return
-        delta_time *= time_speed
-        self.active_time += delta_time
+            # 如果大于阈值，则生成灾害
+            if self.active_time > self.disaster_interval:
+                self.choose_random_disaster()
 
-        # 如果大于阈值，则生成灾害
-        if self.active_time > self.disaster_interval:
-            self.active_time = 0
-            self.trigger_random_disaster(world)
-
-    def trigger_random_disaster(self, world):
+    def choose_random_disaster(self) -> None:
         """随机触发一个灾害"""
-        disaster = random.choice(self.disasters)
-        disaster(world)
+        self.mid_state = random.choice(list(self.disasters.keys()))
 
-    def finish_disaster(self):
-        """结束灾害"""
-        self.current_disaster_text = None
-        self.active_draw_time = 0
+    def start_disaster(self, world: World) -> None:
+        """开始灾害与提示文字"""
+        func = self.disasters[self.mid_state]["func"]
+        func(world)
+        message = self.disasters[self.mid_state]["message"]
+        self.set_disaster_message(message)
+        self.start_disaster_timer()
+
+    def start_disaster_timer(self) -> None:
+        """开始下一次灾害的计时"""
+        self.mid_state = None
+        self.active_time = 0
         self.last_update_time = pygame.time.get_ticks()
         self.disaster_interval = 1000 * random.randrange(self.min_disaster_time, self.max_disaster_time)
 
-    def animal_plague(self, world):
+    def set_disaster_message(self, text: str) -> None:
+        """记录灾害文本并启动显示计时"""
+        self.current_disaster_text = text
+        self.active_draw_time = 0
+        self.last_draw_time = pygame.time.get_ticks()
+
+    def animal_plague(self, world: World) -> None:
         """动物感染瘟疫"""
         candidates = [r for r in world.rabbits if not r.infected]
         if not candidates:
@@ -71,15 +96,12 @@ class DisasterManager:
         to_infect = random.sample(candidates, min(len(candidates), random.randint(1, 2)))
         for r in to_infect:
             r.infect(world.rabbit_config.image_infected)
-        self.set_disaster_message("兔子感染瘟疫！")
 
-    def set_disaster_message(self, text):
-        """记录灾害文本并启动显示计时"""
-        self.current_disaster_text = text
-        self.active_draw_time = 0
-        self.last_draw_time = pygame.time.get_ticks()
+    def harsh_winter(self, world: World) -> None:
+        """冬天延长，植物更容易死亡"""
+        world.season.active_time -= 5000
 
-    def draw(self, screen, time_speed, pause):
+    def draw(self, screen: pygame.surface.Surface, time_speed: int, pause: bool) -> None:
         """绘制灾害提示框（闪烁 + 常亮 + 淡出）"""
         # 只有存在灾害时，才绘制灾害
         if self.current_disaster_text is None:
@@ -95,7 +117,7 @@ class DisasterManager:
         self.active_draw_time += delta_time
 
         if self.active_draw_time > self.total_duration:
-            self.finish_disaster()
+            self.current_disaster_text = None
             return
 
         # 渲染文字表面

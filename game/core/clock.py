@@ -1,10 +1,10 @@
 # clock.py
 import pygame
-from ..utils import color
+from game.utils import color
 
 class Clock:
     
-    def __init__(self, initial_speed, speeds):
+    def __init__(self, initial_speed: int, speeds: list[int]):
         self.years = 0
         self.months = 3
         self.month_time = 5000
@@ -14,7 +14,7 @@ class Clock:
         self.last_update_time = pygame.time.get_ticks()
         self.elapsed_time = 0
 
-    def update(self, pause):
+    def update(self, pause: bool) -> None:
         """更新时间"""
         # 活跃时间检查
         now = pygame.time.get_ticks()
@@ -33,13 +33,13 @@ class Clock:
                 self.months = 1
                 self.years += 1
 
-    def draw(self, screen):
+    def draw(self, screen: pygame.surface.Surface) -> None:
         """绘制时间"""
         time_text = f"{self.years}年{self.months}月"
         text_surface = self.font.render(time_text, True, color.BLACK)
         screen.blit(text_surface, (11, 15))
 
-    def change_speed(self):
+    def change_speed(self) -> None:
         """切换倍速"""
         idx = self.speeds.index(self.speed)
         idx += 1

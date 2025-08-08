@@ -1,6 +1,6 @@
 from PIL import Image, ImageDraw, ImageFilter
 
-def white_to_green(input_path, output_path):
+def white_to_green(input_path: str, output_path: str) -> None:
     # 打开图像，确保为 RGBA 模式（有透明度）
     img = Image.open(input_path).convert("RGBA")
     pixels = img.load()
@@ -24,7 +24,8 @@ def white_to_green(input_path, output_path):
     img.save(output_path)
     print(f"转换完成，保存为：{output_path}")
 
-def white_to_green_with_outline(input_path, output_path, outline_color=(0, 0, 0, 255), outline_width=5):
+def white_to_green_with_outline(input_path: str, output_path: str, outline_color: tuple[int, int, int, int] = (0, 0, 0, 255),
+                                outline_width: int = 5) -> None:
     # 打开图像，确保为 RGBA 模式（有透明度）
     img = Image.open(input_path).convert("RGBA")
     width, height = img.size

@@ -1,15 +1,19 @@
 # animal_species.py
+from __future__ import annotations
+from typing import Optional
 import math
 import random
 import pygame
 import heapq
 from .animal import Animal
-from ...utils.config import MapConfig
+from .plant import Plant
+from game.utils import (MapConfig, RabbitConfig, CrocodileConfig, PlantConfig)
+from game.environment import Season
 
 class Crocodile(Animal):
     carnivore = True  # 食肉动物
 
-    def __init__(self, x, y, config):
+    def __init__(self, x: float, y: float, config: CrocodileConfig):
         super().__init__(x, y, config)
         self.active_time = 0         # 累计活跃时间
         self.boost_active_time = 0   # 累计加速时间
@@ -24,7 +28,8 @@ class Crocodile(Animal):
         self.full_speed_rate = 0.8   # 吃饱后移速的减少倍率
         self.rest_speed_rate = 0.6   # 游走时移速的减少倍率
 
-    def move(self, animals, plants, season, dead_animals, plant_config, time_speed,  pause):
+    def move(self, animals: list[Animal], plants: list[Plant], season: Season, dead_animals: Optional[list[Animal]],
+             plant_config: PlantConfig, time_speed: int, pause: bool) -> None:
         """鳄鱼移动"""
         # 活跃时间检查
         now = pygame.time.get_ticks()
@@ -58,7 +63,7 @@ class Crocodile(Animal):
         # --- 捕食或休息行为 ---
         # 饥饿时捕食
         if self.hungry:
-            prey = self.find_prey(animals)
+            prey = self.find_prey(animals, self.config.min_hunt_distance)
             if prey:
                 self.angle = math.atan2(prey.y - self.y, prey.x - self.x)
                 self.angle += random.uniform(-math.pi / 8, math.pi / 8)
@@ -117,7 +122,7 @@ class Crocodile(Animal):
         self.x = max(self.size[0], min(MapConfig.width - self.size[0], self.x))
         self.y = max(self.size[1], min(MapConfig.height - self.size[1], self.y))
 
-    def find_prey(self, animals, detection_radius=500):
+    def find_prey(self, animals: list[Animal], detection_radius: int) -> Rabbit | None:
         """寻找附近的猎物 herbivore"""
         closest_prey = None
         closest_distance = float('inf')
@@ -130,11 +135,10 @@ class Crocodile(Animal):
                     closest_distance = distance
         return closest_prey
 
-
 class Rabbit(Animal):
     herbivore = True   # 食草动物
 
-    def __init__(self, x, y, config):
+    def __init__(self, x: float, y: float, config: RabbitConfig):
         super().__init__(x, y, config)
         self.boost_active_time = 0   # 累计加速时间
         self.last_update_time = pygame.time.get_ticks()   # 上次检查时间
@@ -149,7 +153,8 @@ class Rabbit(Animal):
         self.infected = False        # 是否感染
         self.immune = False          # 是否免疫传染病
 
-    def move(self, animals, plants, season, dead_animals, plant_config, time_speed,  pause):
+    def move(self, animals: list[Animal], plants: list[Plant], season: Season, dead_animals: Optional[list[Animal]],
+             plant_config: PlantConfig, time_speed: int, pause: bool) -> None:
         """兔子移动"""
         # 活跃时间检查
         now = pygame.time.get_ticks()
@@ -204,7 +209,7 @@ class Rabbit(Animal):
 
         # --- 优先级 ---
         # 最优先：找最近捕食者并远离
-        pre_center = self.find_predator(animals)
+        pre_center = self.find_predator(animals, self.config.min_croc_distance)
         if pre_center:
             # 逃离方向（远离捕食者 + 预测）
             dx = self.x - pre_center[0]
@@ -286,7 +291,7 @@ class Rabbit(Animal):
         self.x = max(self.size[0], min(MapConfig.width - self.size[0], self.x))
         self.y = max(self.size[1], min(MapConfig.height - self.size[1], self.y))
 
-    def find_predator(self, animals):
+    def find_predator(self, animals: list[Animal], detection_radius: int) -> tuple[float, float] | None:
         """寻找最近的食肉动物 carnivore"""
         predators = []
         weights = []
@@ -295,7 +300,7 @@ class Rabbit(Animal):
         for other in animals:
             if getattr(other, 'carnivore', False):
                 distance = math.hypot(self.x - other.x, self.y - other.y)
-                if distance < self.config.min_croc_distance:
+                if distance < detection_radius:
                     weight = 1 / (distance**2 + ε)  # 越近权重越大
                     predators.append((other.x, other.y, weight))
                     weights.append(weight)
@@ -309,7 +314,15 @@ class Rabbit(Animal):
         avg_y = sum(p[1] * p[2] for p in predators) / total_weight
         return avg_x, avg_y
 
-    def find_plant(self, plants):
+    def boundary_force(self, pos: float, min_val: int, max_val: int) -> float:
+        """计算边界力"""
+        if pos < min_val:
+            return (min_val - pos)**2 / self.margin**2
+        elif pos > max_val:
+            return -(pos - max_val)**2 / self.margin**2
+        return 0.0
+
+    def find_plant(self, plants: list[Plant]) -> tuple[list[tuple[float, float, float]], list[tuple[float, float, float]]]:
         """寻找最近的草和治愈药草"""
         all_plants, healing_plants = [], []
 
@@ -325,15 +338,7 @@ class Rabbit(Animal):
         
         return all_plants, healing_plants
 
-    def boundary_force(self, pos, min_val, max_val):
-        """计算边界力"""
-        if pos < min_val:
-            return (min_val - pos)**2 / self.margin**2
-        elif pos > max_val:
-            return -(pos - max_val)**2 / self.margin**2
-        return 0
-
-    def infect(self, virus_image_path):
+    def infect(self, virus_image_path: str) -> None:
         """兔子被感染，替换贴图"""
         # 如果免疫，则不感染
         if self.immune:
@@ -346,10 +351,12 @@ class Rabbit(Animal):
         # 替换贴图
         if virus_image_path not in Animal.loaded_images:
             Animal.loaded_images[virus_image_path] = pygame.transform.smoothscale(
-                pygame.image.load(virus_image_path).convert_alpha(), (self.size[0] * 2, self.size[1] * 2))
+                pygame.image.load(virus_image_path).convert_alpha(),
+                (self.size[0] * 2, self.size[1] * 2)
+            )
         self.image = Animal.loaded_images[virus_image_path]
 
-    def disinfect(self):
+    def disinfect(self) -> None:
         """兔子被治愈，替换贴图"""
         self.infected = False
         self.image = Animal.loaded_images[self.config.image]

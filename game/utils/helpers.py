@@ -1,11 +1,16 @@
 # utils.py
+from __future__ import annotations
 import pygame
-from . import color
-from .config import MapConfig
+from game.utils import (color, MapConfig)
+
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from game.core import Clock
 
 pygame.font.init()
 
-def draw_centered_text(screen, clock, text, y_offset=0, text_color=color.BLACK, font_size=32, font_name="SimSun"):
+def draw_centered_text(screen: pygame.surface.Surface, clock: Clock, text: str, y_offset: int = 0,
+                       text_color: tuple[int, int, int] = color.BLACK, font_name: str = "SimSun") -> None:
     """绘制游戏结局"""
     font = pygame.font.SysFont(font_name, 32)
     text_surface = font.render(text, True, text_color)
@@ -23,7 +28,7 @@ def draw_centered_text(screen, clock, text, y_offset=0, text_color=color.BLACK, 
 
     screen.blit(text_surface, (x, y))
 
-def draw_guide(screen, world):
+def draw_guide(screen: pygame.surface.Surface) -> None:
     """绘制指南界面"""
     # 半透明背景覆盖
     overlay = pygame.Surface((MapConfig.width, MapConfig.height), pygame.SRCALPHA)
@@ -35,9 +40,6 @@ def draw_guide(screen, world):
     guide_rect = pygame.Rect((MapConfig.width - guide_width) // 2, 130, guide_width, guide_height)
     pygame.draw.rect(screen, color.WHITE, guide_rect, border_radius=10)
     pygame.draw.rect(screen, color.BLACK, guide_rect, 2, border_radius=10)
-    
-    # 保存指南矩形位置供事件处理使用
-    world.guide_rect = guide_rect
     
     # 标题
     title_font = pygame.font.SysFont("SimHei", 30)

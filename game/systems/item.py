@@ -1,25 +1,31 @@
 # item.py
+from __future__ import annotations
+from typing import Callable
 import pygame
-from ..biological.plant import Plant
-from ...ui.button import Button
-from ...utils.config import SPRITES_PATH
+from game.entities import Plant
+from game.ui import Button
+from game.utils import SPRITES_PATH
+
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from game.core import World
 
 class Item:
-    def __init__(self, name, icon_path, cost, craft_time, use_func):
-        self.name = name
-        self.quantity = 0
-        self.icon = pygame.transform.smoothscale(pygame.image.load(icon_path).convert_alpha(), (80, 80))
-        self.cost = cost
-        self.is_crafting = False
-        self.craft_time = craft_time
-        self.use_func = use_func
-        self.btn_craft = None
-        self.btn_use = None
+    def __init__(self, name: str, icon_path: str, cost: dict[str, int], craft_time: int, use_func: Callable[[], None]):
+        self.name = name                 # 道具名称
+        self.quantity = 0                # 道具数量
+        self.icon = pygame.transform.smoothscale(pygame.image.load(icon_path).convert_alpha(), (80, 80))   # 道具贴图
+        self.cost = cost                 # 道具消耗
+        self.is_crafting = False         # 制作状态
+        self.craft_time = craft_time     # 制作时间
+        self.use_func = use_func         # 道具效果函数
+        self.btn_craft = None            # 道具制作按钮
+        self.btn_use = None              # 道具使用按钮
 
 class CraftingSystem:
     RESOUCE_NAME = {'leafium': '绿素', 'animite': '兽能', 'ecopoint': '生态点'}
 
-    def __init__(self, world, width, height, font_name="SimSun", font_size=16):
+    def __init__(self, world: World, width: int, height: int, font_name: str = "SimSun", font_size: int = 16):
         self.width = width
         self.height = height
         self.visible = False     # 是否展开道具界面
@@ -44,37 +50,37 @@ class CraftingSystem:
         self.alpha_target = 255  # 目标透明度
         self.alpha_speed = 10    # 每帧增加透明度值（越大越快）
 
-    def create_default_items(self):
+    def create_default_items(self) -> None:
         """初始化道具、使用逻辑和按钮"""
-        def use_heal():
-            # 生成治愈性药草
+        def use_heal() -> None:
+            """生成治愈性药草"""
             config = self.world.plant_config
             config.is_medicative = True
             Plant.medicative_active_time += config.medicative_duration
 
-        def use_speed():
-            # 给鳄鱼加速
+        def use_speed() -> None:
+            """给鳄鱼加速"""
             config = self.world.croc_config
             config.boosting = True
             for croc in self.world.crocodiles:
                 croc.boost_active_time += config.boost_duration
 
-        def use_rain():
-            # 立刻降雨
+        def use_rain() -> None:
+            """立刻降雨"""
             self.world.season.start_rain()
 
-        def use_invincible():
-            # 植物护盾
+        def use_invincible() -> None:
+            """植物护盾"""
             config = self.world.plant_config
             config.is_invincible = True
             Plant.invincible_active_time += config.invincible_duration
 
         # 添加道具
-        item_path = SPRITES_PATH + "items/"
-        self.items.append(Item("治愈药草", item_path + "heal.png", {'leafium': 10}, 10000, use_heal))
-        self.items.append(Item("加速鳄鱼", item_path + "croc.png", {'animite': 10}, 10000, use_speed))
-        self.items.append(Item("人工降雨", item_path + "rain.png", {'ecopoint': 10}, 10000, use_rain))
-        self.items.append(Item("植物护盾", item_path + "invincible.png", {'leafium': 10}, 10000, use_invincible))
+        ITEM_PATH = SPRITES_PATH + "/items"
+        self.items.append(Item("治愈药草", f'{ITEM_PATH}/heal.png', {'leafium': 10}, 10000, use_heal))
+        self.items.append(Item("加速鳄鱼", f'{ITEM_PATH}/croc.png', {'animite': 10}, 10000, use_speed))
+        self.items.append(Item("人工降雨", f'{ITEM_PATH}/rain.png', {'ecopoint': 10}, 10000, use_rain))
+        self.items.append(Item("植物护盾", f'{ITEM_PATH}/invincible.png', {'leafium': 10}, 10000, use_invincible))
 
         # 为每个道具分配两个按钮（制作 + 使用）
         x_start = 160
@@ -98,14 +104,14 @@ class CraftingSystem:
             self.buttons.extend([item.btn_craft, item.btn_use])
             self.active_time[item.name] = 0
 
-    def toggle_visible(self):
+    def toggle_visible(self) -> None:
         """展开或收起道具面板"""
         self.visible = not self.visible
         if self.visible:
             self.current_y = self.height + 100
             self.alpha = 0
 
-    def try_craft(self, item):
+    def try_craft(self, item: Item) -> None:
         """尝试制造道具：资源检查、计时开始"""
         if item.is_crafting:
             return
@@ -116,13 +122,13 @@ class CraftingSystem:
             setattr(self.resource_manager, k, getattr(self.resource_manager, k) - v)
         item.is_crafting = True
 
-    def try_use(self, item):
+    def try_use(self, item: Item) -> None:
         """使用道具，触发效果"""
         if item.quantity > 0:
             item.use_func()
             item.quantity -= 1
 
-    def update(self, time_speed, pause):
+    def update(self, time_speed: int, pause: bool) -> None:
         """更新道具制造进度"""
         now = pygame.time.get_ticks()
         delta_time = now - self.last_update_time
@@ -140,7 +146,7 @@ class CraftingSystem:
                     item.is_crafting = False
                     item.quantity += 1
 
-    def draw(self, screen):
+    def draw(self, screen: pygame.Surface) -> None:
         """绘制道具界面，包括图标、文字、进度条和按钮"""        
         self.draw_active_icons(screen)
 
@@ -208,7 +214,7 @@ class CraftingSystem:
             item.btn_craft.draw(screen)
             item.btn_use.draw(screen)
 
-    def draw_active_icons(self, screen):
+    def draw_active_icons(self, screen: pygame.surface.Surface) -> None:
         """绘制生效的道具"""
         active_icons = []
 
@@ -230,7 +236,7 @@ class CraftingSystem:
             icon_small = pygame.transform.smoothscale(icon, (icon_size, icon_size))
             screen.blit(icon_small, (start_x + i * (icon_size + padding), y))
 
-    def handle_event(self, event):
+    def handle_event(self, event: pygame.event.Event) -> None:
         """转发事件给所有按钮"""
         if not self.visible:
             return

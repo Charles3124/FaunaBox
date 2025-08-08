@@ -2,16 +2,14 @@
 import pygame
 import math
 import random
-from ..utils import color
-from ..utils.config import MapConfig
-from ..core.sounds import sound_manager
+from game.utils import (color, MapConfig, sound_manager)
 
 class Season:
     config = None
-    SEASONS = ['春天', '夏天', '秋天', '冬天']
+    SEASONS = ('春天', '夏天', '秋天', '冬天')
     COLORS = {"春天": color.LIGHT_GREEN, "夏天": color.LIGHT_YELLOW, "秋天": color.LIGHT_ORANGE, "冬天": color.PALE_BLUE}
 
-    def __init__(self, font_name="SimSun", font_size=20, position=(370, 20)):
+    def __init__(self, position: tuple[int, int] = (370, 20), font_name: str = "SimSun", font_size: int = 20):
         self.active_time = 0    # 累计活跃时间
         self.last_update_time = pygame.time.get_ticks()   # 上次检查时间
 
@@ -38,7 +36,7 @@ class Season:
         self.rain_check_interval = 10000   # 每隔 10 秒检查一次是否降雨
         self.raindrops = []                # 雨滴效果
 
-    def update(self, time_speed, pause):
+    def update(self, time_speed: int, pause: bool) -> None:
         """根据时间判断是否需要切换季节、是否降雨"""
         # 活跃时间检查
         now = pygame.time.get_ticks()
@@ -57,7 +55,6 @@ class Season:
         # 仅在非暂停时累计有效运行时间
         delta_time *= time_speed
         self.active_time += delta_time
-        change = False
 
         # 更新季节
         if self.active_time > Season.config.switch_interval:
@@ -65,7 +62,6 @@ class Season:
             self.index = (self.index + 1) % 4
             self.current = self.SEASONS[self.index]
             self.target_color = self.COLORS[self.current]
-            change = True
         
         # 如果当前为非降雨状态
         if not self.is_raining:
@@ -86,9 +82,8 @@ class Season:
             # 检查是否结束降雨
             if self.rain_duration_timer > self.rain_duration:
                 self.stop_rain()
-        return change
 
-    def start_rain(self):
+    def start_rain(self) -> None:
         """开始降雨"""
         self.is_raining = True
         self.rain_duration_timer = 0
@@ -96,13 +91,13 @@ class Season:
         self.raindrops = [{"x": random.randint(0, MapConfig.width), "y": random.randint(-200, 0), "speed": random.randint(5, 12)} for _ in range(150)]
         sound_manager.sound_dict['rain'].play(-1)
 
-    def stop_rain(self):
+    def stop_rain(self) -> None:
         """结束降雨"""
         self.is_raining = False
         self.raindrops.clear()
         sound_manager.sound_dict['rain'].stop()
 
-    def update_raindrops(self):
+    def update_raindrops(self) -> None:
         """更新雨滴"""
         for drop in self.raindrops:
             drop["y"] += drop["speed"]
@@ -110,19 +105,14 @@ class Season:
                 drop["y"] = random.randint(-100, 0)
                 drop["x"] = random.randint(0, MapConfig.width)
 
-    def get_rain_duration(self):
+    def get_rain_duration(self) -> int:
         """计算降雨时长"""
-        # 截断指数分布（inverse transform sampling，限制在 [min, max]）
-        u = random.random()
-
-        # 生成一个截断后的 CDF 值
-        u_scaled = u * (self.cdf_max - self.cdf_min) + self.cdf_min
-
-        # 反推对应的 duration
-        duration = self.min_duration - (1 / self.lambda_param) * math.log(1 - u_scaled)
+        u = random.random()   # 截断指数分布（inverse transform sampling，限制在 [min, max]）
+        u_scaled = u * (self.cdf_max - self.cdf_min) + self.cdf_min   # 生成一个截断后的 CDF 值
+        duration = self.min_duration - (1 / self.lambda_param) * math.log(1 - u_scaled)   # 反推对应的 duration
         return int(round(duration / 1000) * 1000)
 
-    def draw(self, screen):
+    def draw(self, screen: pygame.surface.Surface) -> None:
         """绘制季节和雨滴"""
         text_surface = self.font.render(f"{self.current}", True, (0, 0, 0))
         bg_rect = text_surface.get_rect(topleft=self.position)
@@ -140,7 +130,7 @@ class Season:
             for drop in self.raindrops:
                 pygame.draw.line(screen, (100, 100, 255), (drop["x"], drop["y"]), (drop["x"], drop["y"] + 5), 3)
 
-    def change_to(self, target_season):
+    def change_to(self, target_season: str) -> None:
         """切换季节"""
         self.index = self.SEASONS.index(target_season)
         self.current = target_season
@@ -148,26 +138,21 @@ class Season:
         self.active_time = 0
         self.last_update_time = pygame.time.get_ticks()
 
-    def get_multiplier_a(self):
+    def get_multiplier_a(self) -> float:
         """获取动物移速倍率"""
         return Season.config.speed_multipliers[self.current]
 
-    def get_multiplier_p(self):
+    def get_multiplier_p(self) -> float:
         """获取植物生长倍率"""
         return Season.config.interval_multipliers[self.current]
-    
-    def get_rabbit_threshold(self, current):
-        """获取兔子繁殖阈值"""
-        return Season.config.rabbit_threshold[current]
 
-    def get_color(self):
+    def get_color(self) -> tuple[int, int, int]:
         """获取背景颜色"""
         return self.color
     
-    def lerp_color(self, c1, c2, t):
+    def lerp_color(self, c1: tuple[int, int, int], c2: tuple[int, int, int], t: float) -> tuple[int, int, int]:
         """计算过渡颜色"""
         return tuple(int(c1[i] + (c2[i] - c1[i]) * t) for i in range(3))
-
 
 if __name__ == '__main__':
     import matplotlib.pyplot as plt

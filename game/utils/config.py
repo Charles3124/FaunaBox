@@ -2,9 +2,9 @@
 import math
 from dataclasses import dataclass, field
 
-BASE_PATH = "D:/My Programs/FaunaBox/"
-SOUNDS_PATH = BASE_PATH + "assets/sounds/"
-SPRITES_PATH = BASE_PATH + "assets/sprites/"
+BASE_PATH = "D:/My Programs/FaunaBox"
+SOUNDS_PATH = f'{BASE_PATH}/assets/sounds'
+SPRITES_PATH = f'{BASE_PATH}/assets/sprites'
 
 @dataclass
 class MapConfig:
@@ -14,8 +14,8 @@ class MapConfig:
 @dataclass
 class RabbitConfig:
     # 贴图
-    image: str = SPRITES_PATH + "animals/rabbit.png"   # 兔子贴图
-    image_infected: str = SPRITES_PATH + "animals/rabbit_infected.png"   # 感染兔子贴图
+    image: str = f'{SPRITES_PATH}/animals/rabbit.png'   # 兔子贴图
+    image_infected: str = f'{SPRITES_PATH}/animals/rabbit_infected.png'   # 感染兔子贴图
 
     # 基础属性
     initial_num: int = 8              # 初始数量
@@ -51,14 +51,14 @@ class RabbitConfig:
 @dataclass
 class CrocodileConfig:
     # 贴图
-    image: str = SPRITES_PATH + "animals/crocodile.png"   # 鳄鱼贴图
+    image: str = f'{SPRITES_PATH}/animals/crocodile.png'   # 鳄鱼贴图
 
     # 基础属性
     initial_num: int = 2              # 初始数量
     size: tuple = (40 // 2, 40 // 2)  # 鳄鱼大小
 
     min_distance: int = 100           # 鳄鱼间最小距离
-    min_hunt_distance: int = 300      # 觅食范围
+    min_hunt_distance: int = 500      # 觅食范围
     min_eat_distance: int = 40        # 进食范围
 
     ave_speed: float = 1.2            # 速度平均值
@@ -80,8 +80,8 @@ class CrocodileConfig:
 @dataclass
 class PlantConfig:
     # 贴图
-    image: str = SPRITES_PATH + "plants/grass.png"     # 植物贴图
-    image_medicative: str = SPRITES_PATH + "plants/grass_medicative.png"   # 治愈性植物贴图
+    image: str = f'{SPRITES_PATH}/plants/grass.png'     # 植物贴图
+    image_medicative: str = f'{SPRITES_PATH}/plants/grass_medicative.png'   # 治愈性植物贴图
 
     # 基础属性
     initial_num: int = 20              # 初始数量

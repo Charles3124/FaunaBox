@@ -1,14 +1,22 @@
 # button.py
+from __future__ import annotations
+from typing import Callable
 import pygame
-from ..utils import color
-from ..core.sounds import sound_manager
+from game.utils import (color, sound_manager)
+
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from game.core import World
 
 class Button:
     
-    def __init__(self, rect_or_center, on_click=None, text=None, tooltip_text=None, tooltip_offset=None,
-                 font_size=20, font_name="SimSun", display=True,
-                 color_idle=color.LIGHT_SLATE_GRAY, color_hover=color.DIM_GRAY, text_color=color.WHITE):
-        self.rect = pygame.Rect(rect_or_center) # 创建矩形
+    def __init__(self, rect_info: tuple[int, int, int, int], on_click: Callable | None = None, text: str | None = None,
+                 tooltip_text: str | None = None, tooltip_offset: tuple[int, int] | None = None,
+                 font_size: int = 20, font_name: str = "SimSun", display: bool = True,
+                 color_idle: tuple[int, int, int] = color.LIGHT_SLATE_GRAY,
+                 color_hover: tuple[int, int, int] = color.DIM_GRAY,
+                 text_color: tuple[int, int, int] = color.WHITE):
+        self.rect = pygame.Rect(rect_info)      # 创建矩形
         self.display = display                  # 显示状态
         self.text = text                        # 按钮文字
         self.on_click = on_click                # 按钮响应函数
@@ -24,7 +32,7 @@ class Button:
 
         self.font = pygame.font.SysFont(font_name, font_size)   # 创建字体
 
-    def draw(self, screen):
+    def draw(self, screen: pygame.surface.Surface) -> None:
         """绘制按钮"""
         if not self.display:
             return
@@ -51,7 +59,7 @@ class Button:
         if self.hovered and self.tooltip_text:
             self.draw_tooltip(screen)
 
-    def draw_tooltip(self, screen):
+    def draw_tooltip(self, screen: pygame.surface.Surface) -> None:
         """绘制提示框"""
         tip_surface = self.font.render(self.tooltip_text, True, color.BLACK)
         bg_rect = tip_surface.get_rect()
@@ -71,7 +79,7 @@ class Button:
         screen.blit(bg_surface, bg_rect.topleft)
         screen.blit(tip_surface, (bg_rect.left + 6, bg_rect.top + 4))
 
-    def handle_event(self, event):
+    def handle_event(self, event: pygame.event.Event) -> None:
         """处理事件"""
         if not self.display:
             return
@@ -83,3 +91,70 @@ class Button:
             if self.rect.collidepoint(event.pos) and self.on_click is not None:
                 sound_manager.sound_dict['click_settings1'].play()
                 self.on_click()
+
+def toggle_pause(world: World) -> None:
+    """按钮响应函数：暂停"""
+    if not world.tech_tree.visible and not world.guide_visible:
+        world.pause = not world.pause
+
+def restart(world: World, width: int, height: int, set_buttons: Callable[[list[Button]], None]) -> list[Button]:
+    """按钮响应函数：重置"""
+    sound_manager.stop_all_bgm()
+    sound_manager.play_random_bgm()
+    world.restart()
+    return create_ui_buttons(world, width, height, set_buttons)
+
+def toggle_tech(world: World) -> None:
+    """按钮响应函数：打开科技树"""
+    if not world.tech_tree.visible:
+        world.last_pause = world.pause
+        world.pause = True
+    else:
+        world.pause = world.last_pause
+    world.tech_tree.toggle()
+
+def toggle_guide(world: World) -> None:
+    """按钮响应函数：打开指南"""
+    if not world.guide_visible:
+        world.last_pause_guide = world.pause
+        world.pause = True
+    else:
+        world.pause = world.last_pause_guide
+    world.guide_visible = not world.guide_visible
+
+def create_ui_buttons(world: World, width: int, height: int, set_buttons: Callable[[list[Button]], None]) -> list[Button]:
+    """创建按钮"""
+    return [
+        Button((270, 15, 60, 30),
+               on_click=lambda: set_buttons(restart(world, width, height, set_buttons)),
+               text="重置",
+               tooltip_text="重置整个生态箱"),
+
+        Button((190, 15, 60, 30),
+               on_click=lambda: toggle_pause(world),
+               text="暂停",
+               tooltip_text="暂停或继续"),
+
+        Button((130, 15, 45, 30),
+               on_click=lambda: world.clock.change_speed(),
+               text=lambda: f"{world.clock.speed}x",
+               tooltip_text="切换倍速"),
+
+        Button((width - 100, 15, 80, 30),
+               on_click=lambda: toggle_tech(world),
+               text="科技树",
+               tooltip_text="强化你的科技！",
+               tooltip_offset=(-150, 0)),
+
+        Button((20, height - 50, 120, 30),
+               on_click=world.crafting_system.toggle_visible,
+               text="道具制作",
+               tooltip_text="制作你的道具！",
+               tooltip_offset=(0, -30)),
+
+        Button((width - 100, height - 50, 80, 30),
+               on_click=lambda: toggle_guide(world),
+               text="指南",
+               tooltip_text="查看游戏指南",
+               tooltip_offset=(-150, -30)),
+    ]

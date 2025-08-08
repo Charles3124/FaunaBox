@@ -1,7 +1,14 @@
 # plant.py
+from __future__ import annotations
 import pygame
 import random
-from ...utils.config import MapConfig
+from game.utils import (MapConfig, PlantConfig)
+from game.core import ResourceManager
+from game.environment import Season
+
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from game.entities import Rabbit
 
 class Plant:
     config = None
@@ -13,7 +20,7 @@ class Plant:
     last_remove_time = pygame.time.get_ticks()
     loaded_images = {}
     
-    def __init__(self, x, y, config):
+    def __init__(self, x: float, y: float, config: PlantConfig):
         self.x = x
         self.y = y
         self.size = config.size
@@ -21,18 +28,17 @@ class Plant:
         if config.image not in Plant.loaded_images:
             Plant.loaded_images[config.image] = pygame.transform.smoothscale(pygame.image.load(config.image).convert_alpha(),
                                                                              (self.size[0] * 2, self.size[1] * 2))
-
         self.image = Plant.loaded_images[config.image]
 
         self.medicative = False   # 是否有治愈性
 
-    def draw(self, screen):
+    def draw(self, screen: pygame.surface.Surface) -> None:
         """绘制植物"""
         rect = self.image.get_rect(center=(self.x, self.y))
         screen.blit(self.image, rect)
 
     @staticmethod
-    def is_too_close_p(new_plant, plants):
+    def is_too_close_p(new_plant: Plant, plants: list[Plant]) -> bool:
         """控制植物距离"""
         for plant in plants:
             distance = ((new_plant.x - plant.x) ** 2 + (new_plant.y - plant.y) ** 2) ** 0.5
@@ -40,33 +46,36 @@ class Plant:
                 return True
         return False
 
+    @staticmethod
+    def create_new_p(config: PlantConfig) -> tuple[float, float]:
+        new_x = random.uniform(config.size[0], MapConfig.width - config.size[0])
+        new_y = random.uniform(config.size[1], MapConfig.height - config.size[1])
+        return Plant(new_x, new_y, config)
+
     @classmethod
-    def initialize_plants(cls, num_plants):
+    def initialize_plants(cls, num_plants: int) -> list[Plant]:
         """初始化植物"""
         plants = []
         for _ in range(num_plants):
             for _ in range(100):
-                new_x = random.uniform(cls.config.size[0], MapConfig.width - cls.config.size[0])
-                new_y = random.uniform(cls.config.size[1], MapConfig.height - cls.config.size[1])
-                new_plant = Plant(new_x, new_y, cls.config)
+                new_plant = cls.create_new_p(cls.config)
                 if not cls.is_too_close_p(new_plant, plants):
                     plants.append(new_plant)
                     break
         return plants
 
     @classmethod
-    def add_one_plant(cls, plants):
+    def add_one_plant(cls, plants: list[Plant]) -> Plant:
         """加一个植物"""
         for _ in range(100):
-            new_x = random.uniform(cls.config.size[0], MapConfig.width - cls.config.size[0])
-            new_y = random.uniform(cls.config.size[1], MapConfig.height - cls.config.size[1])
-            new_plant = Plant(new_x, new_y, cls.config)
+            new_plant = cls.create_new_p(cls.config)
             if not cls.is_too_close_p(new_plant, plants):
                 break
         return new_plant
 
     @classmethod
-    def add_new_plant(cls, plants, season, resource_manager, time_speed, pause):
+    def add_new_plant(cls, plants: list[Plant], season: Season, resource_manager: ResourceManager,
+                      time_speed: int, pause: bool) -> None:
         """植物繁殖"""
         # 如果还有植物，则植物可以繁衍
         if len(plants) != 0:
@@ -113,9 +122,7 @@ class Plant:
 
                 # 尝试一定次数
                 for _ in range(100 * target_num):
-                    new_x = random.uniform(cls.config.size[0], MapConfig.width - cls.config.size[0])
-                    new_y = random.uniform(cls.config.size[1], MapConfig.height - cls.config.size[1])
-                    new_plant = Plant(new_x, new_y, cls.config)
+                    new_plant = cls.create_new_p(cls.config)
 
                     # 判断该位置能否生成植物
                     if not cls.is_too_close_p(new_plant, plants):
@@ -140,7 +147,8 @@ class Plant:
                             break
 
     @classmethod
-    def remove_plants_near_animals(cls, plants, animals, season, resource_manager, time_speed, pause):
+    def remove_plants_near_animals(cls, plants: list[Plant], animals: list[Rabbit],
+                                   season: Season, resource_manager: ResourceManager, time_speed: int, pause: bool) -> None:
         """移除植物"""
         # 活跃时间检查
         now = pygame.time.get_ticks()
@@ -181,7 +189,7 @@ class Plant:
                     plants.remove(plant)
 
     @staticmethod
-    def is_too_close_to_animal(plant, animals):
+    def is_too_close_to_animal(plant: Plant, animals: list[Rabbit]) -> Rabbit | None:
         """判断是否被吃"""
         for animal in animals:
             if getattr(animal, 'herbivore', False):
@@ -191,6 +199,6 @@ class Plant:
         return None
 
     @classmethod
-    def boost_growth(cls):
+    def boost_growth(cls) -> None:
         """触发植物加速生长"""
         cls.config.boosting = True

@@ -1,18 +1,14 @@
 # tech_tree.py
 import pygame
-from ..utils import color
-from ..entities.biological.animal_species import *
-from ..entities.biological.plant import Plant
-from ..entities.buildings.building import Building
-from ..environment.season import Season
-from ..core.sounds import sound_manager
-from ..core.resources import ResourceManager
-from ..utils.config import SPRITES_PATH
+from game.core import ResourceManager
+from game.utils import (SPRITES_PATH, color, sound_manager)
+from game.entities import (Rabbit, Crocodile, Plant, Building)
+from game.environment import Season
 
 class TechTree:
     RESOUCE_NAME = {'leafium': '绿素', 'animite': '兽能', 'ecopoint': '生态点'}
 
-    def __init__(self, resource_manager, width, height, font_name="SimSun", font_size=20):
+    def __init__(self, resource_manager: ResourceManager, width: int, height: int, font_name: str = "SimSun", font_size: int = 20):
         self.resource_manager = resource_manager   # 资源管理器
         self.width = width             # 屏幕宽度
         self.height = height           # 屏幕高度
@@ -75,14 +71,14 @@ class TechTree:
 
         self.rects = []  # 存储按钮区域（供点击判定）
 
-        self.building_path = SPRITES_PATH + "buildings/"
+        building_path = SPRITES_PATH + "/buildings"
         self.buildings = {
-            "植物庇护站": Building("植物庇护站", self.building_path + "plant_shelter.png", (200, 200), (200, 200)),
-            "动物缓冲地带": Building("动物缓冲地带", self.building_path + "animal_zone.png", (width - 200, height - 300), (200, 200)),
-            "兔子哨站": Building("兔子哨站", self.building_path + "rabbit_outpost.png", (200, height - 200), (200, 200)),
+            "植物庇护站": Building("植物庇护站", f'{building_path}/plant_shelter.png', (200, 200), (200, 200)),
+            "动物缓冲地带": Building("动物缓冲地带", f'{building_path}/animal_zone.png', (width - 200, height - 300), (200, 200)),
+            "兔子哨站": Building("兔子哨站", f'{building_path}/rabbit_outpost.png', (200, height - 200), (200, 200)),
         }
 
-    def toggle(self):
+    def toggle(self) -> None:
         """切换可见性"""
         self.visible = not self.visible
         if self.visible:   # 切换 BGM
@@ -90,7 +86,7 @@ class TechTree:
         else:
             sound_manager.play_random_bgm()
 
-    def handle_click(self, pos):
+    def handle_click(self, pos: tuple[int, int]) -> None:
         """处理点击事件"""
         if not self.visible:
             return
@@ -100,11 +96,11 @@ class TechTree:
                 if not tech["unlocked"] and self.can_afford(tech["cost"]):
                     self.unlock_tech(area, index)
 
-    def can_afford(self, cost):
+    def can_afford(self, cost: dict[str, int]) -> bool:
         """判断资源是否足够点亮科技"""
         return all(getattr(self.resource_manager, key) >= value for key, value in cost.items())
 
-    def unlock_tech(self, area, index):
+    def unlock_tech(self, area: str, index: int) -> None:
         """解锁科技，并应用科技效果"""
         tech = self.techs[area][index]
         for key, value in tech["cost"].items():
@@ -114,7 +110,7 @@ class TechTree:
         self.unlock_message = f"科技已解锁：{tech['name']}！"  # 解锁提示
         self.unlock_time = pygame.time.get_ticks()
 
-    def apply_effects(self):
+    def apply_effects(self) -> None:
         """根据已解锁科技，修改系统配置"""
         for area, techs in self.techs.items():
             for i, tech in enumerate(techs):
@@ -166,7 +162,7 @@ class TechTree:
                     
                     tech["applied"] = True  # 标记为已应用
 
-    def draw(self, screen):
+    def draw(self, screen: pygame.surface.Surface) -> None:
         """绘制科技树、说明和提示"""
         if not self.visible:
             return
@@ -240,7 +236,7 @@ class TechTree:
             # 文字绘制
             screen.blit(tip_surface, (bg_rect.left + 6, bg_rect.top + 3))
 
-    def draw_hover_description(self, screen):
+    def draw_hover_description(self, screen: pygame.surface.Surface) -> None:
         """绘制悬停说明"""
         if not self.visible:
             return
@@ -267,7 +263,7 @@ class TechTree:
                     screen.blit(text_surf, (bg_rect.x + padding, bg_rect.y + padding))
                 break
 
-    def update_hover_state(self):
+    def update_hover_state(self) -> None:
         """更新按钮悬停状态"""
         mouse_pos = pygame.mouse.get_pos()
         self.hovered_index = None

@@ -1,18 +1,14 @@
 # world.py
-from ..utils.helpers import draw_guide
-from ..utils.config import *
-from .clock import Clock
-from .resources import ResourceManager
-from ..environment.season import Season
-from ..environment.disaster import DisasterManager
-from ..systems.tech_tree import TechTree
-from ..entities.biological.plant import Plant
-from ..entities.biological.animal_species import Rabbit, Crocodile
-from ..entities.items.item import CraftingSystem
+import pygame
+from game.core import (Clock, ResourceManager)
+from game.utils import (RabbitConfig, CrocodileConfig, PlantConfig, SeasonConfig, draw_guide)
+from game.environment import (Season, DisasterManager)
+from game.systems import (CraftingSystem, TechTree)
+from game.entities import (Plant, Rabbit, Crocodile, Animal)
 
 class World:
 
-    def __init__(self, width, height, test_state=0, initial_speed=1, speeds=[1, 2, 4]):
+    def __init__(self, width: int, height: int, test_state: int = 0, initial_speed: int = 1, speeds: list[int] = [1, 2, 4]):
         # 基础状态
         self.width = width
         self.height = height
@@ -24,7 +20,6 @@ class World:
 
         self.last_pause = None
         self.guide_visible = False
-        self.guide_rect = None
         self.last_pause_guide = None
 
         # 配置和系统初始化（时间、季节、灾害、资源）
@@ -55,25 +50,25 @@ class World:
         self.crafting_system = CraftingSystem(self, self.width, self.height)
 
     @property
-    def animals(self):
+    def animals(self) -> list[Animal]:
         """获取所有动物"""
         return self.rabbits + self.crocodiles
 
-    def can_update(self):
+    def can_update(self) -> bool:
         """检测是否结束"""
         return not self.end
 
-    def can_progress(self):
+    def can_progress(self) -> bool:
         """检测是否暂停"""
         return not self.pause and not self.end
 
-    def update_always(self):
+    def update_always(self) -> None:
         """始终更新"""
         self.resource_manager.update_ecopoints(self.clock.speed, self.pause)
         Plant.add_new_plant(self.plants, self.season, self.resource_manager, self.clock.speed, self.pause)
         self.season.update(self.clock.speed, self.pause)
         self.clock.update(self.pause)
-        self.disaster.update(self, self.clock.speed, self.pause)
+        self.disaster.update(self, self.season, self.clock.speed, self.pause)
         self.crafting_system.update(self.clock.speed, self.pause)
 
         for animal in self.animals:
@@ -81,10 +76,10 @@ class World:
 
         Plant.remove_plants_near_animals(self.plants, self.rabbits, self.season, self.resource_manager, self.clock.speed, self.pause)
 
-    def update_when_active(self):
+    def update_when_active(self) -> None:
         """非暂停时更新"""
-        self.rabbits.extend(Rabbit.add_new_animal(self.rabbits, self.rabbit_config, self.resource_manager, self.animals, self.season))
-        self.crocodiles.extend(Crocodile.add_new_animal(self.crocodiles, self.croc_config, self.resource_manager, self.animals, self.season))
+        self.rabbits.extend(Rabbit.add_new_animal(self.rabbits, self.rabbit_config, self.animals, self.resource_manager, self.season))
+        self.crocodiles.extend(Crocodile.add_new_animal(self.crocodiles, self.croc_config, self.animals, self.resource_manager, self.season))
 
         self.rabbits = Rabbit.remove_old_animals(self.rabbits)
         self.crocodiles = Crocodile.remove_old_animals(self.crocodiles)
@@ -94,7 +89,7 @@ class World:
                 self.rabbits.remove(dead)
         self.dead_animals.clear()
 
-    def check_end(self):
+    def check_end(self) -> None:
         """检测结束状态"""
         if len(self.plants) == 0:
             self.end = self.ending1 = True
@@ -103,11 +98,11 @@ class World:
         elif len(self.crocodiles) == 0:
             self.end = self.ending3 = True
 
-    def restart(self):
+    def restart(self) -> None:
         """重置世界"""
         self.__init__(self.width, self.height)
 
-    def draw(self, screen):
+    def draw(self, screen: pygame.surface.Surface) -> None:
         """绘制世界"""
         # 绘制建筑、植物、动物
         if not self.tech_tree.visible:
@@ -127,4 +122,4 @@ class World:
         self.crafting_system.draw(screen)
 
         if self.guide_visible:
-            draw_guide(screen, self)
+            draw_guide(screen)
