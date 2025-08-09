@@ -99,6 +99,7 @@ class PlantConfig:
     
     rain_bonus: float = 0.8        # 雨水增益倍率
     winter_harshness: float = 1.0  # 冬天植物死亡倍率
+    is_fragile: bool = False       # 冬天是否脆弱
     survive_winter: bool = False   # 是否免疫寒冷
 
     double_reproduction: bool = False      # 双倍繁殖

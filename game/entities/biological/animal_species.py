@@ -63,7 +63,7 @@ class Crocodile(Animal):
         # --- 捕食或休息行为 ---
         # 饥饿时捕食
         if self.hungry:
-            prey = self.find_prey(animals, self.config.min_hunt_distance)
+            prey = self._find_prey(animals, self.config.min_hunt_distance)
             if prey:
                 self.angle = math.atan2(prey.y - self.y, prey.x - self.x)
                 self.angle += random.uniform(-math.pi / 8, math.pi / 8)
@@ -122,7 +122,7 @@ class Crocodile(Animal):
         self.x = max(self.size[0], min(MapConfig.width - self.size[0], self.x))
         self.y = max(self.size[1], min(MapConfig.height - self.size[1], self.y))
 
-    def find_prey(self, animals: list[Animal], detection_radius: int) -> Rabbit | None:
+    def _find_prey(self, animals: list[Animal], detection_radius: int) -> Rabbit | None:
         """寻找附近的猎物 herbivore"""
         closest_prey = None
         closest_distance = float('inf')
@@ -209,15 +209,15 @@ class Rabbit(Animal):
 
         # --- 优先级 ---
         # 最优先：找最近捕食者并远离
-        pre_center = self.find_predator(animals, self.config.min_croc_distance)
+        pre_center = self._find_predator(animals, self.config.min_croc_distance)
         if pre_center:
             # 逃离方向（远离捕食者 + 预测）
             dx = self.x - pre_center[0]
             dy = self.y - pre_center[1]
 
             # 边界力（非线性，增强逃离边缘）
-            boundary_force_x = self.boundary_force(self.x, self.margin, MapConfig.width - self.margin)
-            boundary_force_y = self.boundary_force(self.y, self.margin, MapConfig.height - self.margin)
+            boundary_force_x = self._boundary_force(self.x, self.margin, MapConfig.width - self.margin)
+            boundary_force_y = self._boundary_force(self.y, self.margin, MapConfig.height - self.margin)
 
             # 合成总方向向量（逃离 + 边界）
             combined_dx = dx * self.escape_weight + boundary_force_x * self.boundary_weight
@@ -261,7 +261,7 @@ class Rabbit(Animal):
             
             # 次优先：靠近植物
             if not plant_config.is_invincible:
-                all_plants, healing_plants = self.find_plant(plants)
+                all_plants, healing_plants = self._find_plant(plants)
 
                 # 如果自身感染，并且范围里有治愈药草
                 if self.infected and healing_plants:
@@ -291,7 +291,7 @@ class Rabbit(Animal):
         self.x = max(self.size[0], min(MapConfig.width - self.size[0], self.x))
         self.y = max(self.size[1], min(MapConfig.height - self.size[1], self.y))
 
-    def find_predator(self, animals: list[Animal], detection_radius: int) -> tuple[float, float] | None:
+    def _find_predator(self, animals: list[Animal], detection_radius: int) -> tuple[float, float] | None:
         """寻找最近的食肉动物 carnivore"""
         predators = []
         weights = []
@@ -314,7 +314,7 @@ class Rabbit(Animal):
         avg_y = sum(p[1] * p[2] for p in predators) / total_weight
         return avg_x, avg_y
 
-    def boundary_force(self, pos: float, min_val: int, max_val: int) -> float:
+    def _boundary_force(self, pos: float, min_val: int, max_val: int) -> float:
         """计算边界力"""
         if pos < min_val:
             return (min_val - pos)**2 / self.margin**2
@@ -322,7 +322,7 @@ class Rabbit(Animal):
             return -(pos - max_val)**2 / self.margin**2
         return 0.0
 
-    def find_plant(self, plants: list[Plant]) -> tuple[list[tuple[float, float, float]], list[tuple[float, float, float]]]:
+    def _find_plant(self, plants: list[Plant]) -> tuple[list[tuple[float, float, float]], list[tuple[float, float, float]]]:
         """寻找最近的草和治愈药草"""
         all_plants, healing_plants = [], []
 
@@ -344,7 +344,7 @@ class Rabbit(Animal):
         if self.immune:
             return
         
-        # 受感染，且拥有免疫力，下次不会被感染
+        # 受感染，获得免疫力，下次不会被感染
         self.infected = True
         self.immune = True
 

@@ -21,8 +21,10 @@ class Animal:
         self.size = config.size
 
         if config.image not in Animal.loaded_images:
-            Animal.loaded_images[config.image] = pygame.transform.smoothscale(pygame.image.load(config.image).convert_alpha(),
-                                                                              (self.size[0] * 2, self.size[1] * 2))
+            Animal.loaded_images[config.image] = pygame.transform.smoothscale(
+                pygame.image.load(config.image).convert_alpha(),
+                (self.size[0] * 2, self.size[1] * 2)
+            )
         self.image = Animal.loaded_images[config.image]
 
         # 速度属性
@@ -57,16 +59,16 @@ class Animal:
         return [animal for animal in animals if animal.age < animal.age_random]
 
     @classmethod
-    def is_too_close_a(cls, new_animal: Animal, animals: list[Animal], config: AnimalConfig) -> bool:
+    def _is_too_close_a(cls, new_animal: Animal, animals: list[Animal], config: AnimalConfig) -> bool:
         """控制动物距离"""
         for animal in animals:
-            distance = ((new_animal.x - animal.x)**2 + (new_animal.y - animal.y)**2)**0.5
-            if distance < config.min_distance:
+            distance = (new_animal.x - animal.x)**2 + (new_animal.y - animal.y)**2
+            if distance < config.min_distance**2:
                 return True
         return False
 
     @staticmethod
-    def calculate_new_pos(config: AnimalConfig) -> tuple[float, float]:
+    def _calculate_new_pos(config: AnimalConfig) -> tuple[float, float]:
         new_x = random.uniform(config.size[0], MapConfig.width - config.size[0])
         new_y = random.uniform(config.size[1], MapConfig.height - config.size[1])
         return new_x, new_y
@@ -77,22 +79,12 @@ class Animal:
         animals = []
         for _ in range(config.initial_num):
             for _ in range(100):
-                new_x, new_y = cls.calculate_new_pos(config)
+                new_x, new_y = cls._calculate_new_pos(config)
                 new_animal = cls(new_x, new_y, config)
-                if not cls.is_too_close_a(new_animal, animals, config):
+                if not cls._is_too_close_a(new_animal, animals, config):
                     animals.append(new_animal)
                     break
         return animals
-
-    @classmethod
-    def add_one_animal(cls, config: AnimalConfig, all_animals: list[Animal]) -> Animal:
-        """加一个动物"""
-        for _ in range(100):
-            new_x, new_y = cls.calculate_new_pos(config)
-            new_animal = cls(new_x, new_y, config)
-            if not cls.is_too_close_a(new_animal, all_animals, config):
-                break
-        return new_animal
 
     @classmethod
     def add_new_animal(cls, animals: list[Animal], config: AnimalConfig, all_animals: list[Animal],
@@ -109,9 +101,9 @@ class Animal:
                     animal.energy = 0
                 
                 for _ in range(100):
-                    new_x, new_y = cls.calculate_new_pos(config)
+                    new_x, new_y = cls._calculate_new_pos(config)
                     new_animal = cls(new_x, new_y, config)
-                    if not cls.is_too_close_a(new_animal, all_animals, config):
+                    if not cls._is_too_close_a(new_animal, all_animals, config):
                         new_animals.append(new_animal)
                         resource_manager.gain_animite(config.reproduction_resource)
                         break

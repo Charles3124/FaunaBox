@@ -100,6 +100,7 @@ class DisasterManager:
     def harsh_winter(self, world: World) -> None:
         """冬天延长，植物更容易死亡"""
         world.season.active_time -= 5000
+        world.plant_config.is_fragile = True
 
     def draw(self, screen: pygame.surface.Surface, time_speed: int, pause: bool) -> None:
         """绘制灾害提示框（闪烁 + 常亮 + 淡出）"""

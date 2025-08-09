@@ -56,7 +56,7 @@ class CraftingSystem:
             """生成治愈性药草"""
             config = self.world.plant_config
             config.is_medicative = True
-            Plant.medicative_active_time += config.medicative_duration
+            Plant.states["is_medicative"] += config.medicative_duration
 
         def use_speed() -> None:
             """给鳄鱼加速"""
@@ -73,7 +73,7 @@ class CraftingSystem:
             """植物护盾"""
             config = self.world.plant_config
             config.is_invincible = True
-            Plant.invincible_active_time += config.invincible_duration
+            Plant.states["is_invincible"] += config.invincible_duration
 
         # 添加道具
         ITEM_PATH = SPRITES_PATH + "/items"
