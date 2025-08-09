@@ -4,7 +4,7 @@ from typing import Callable
 import pygame
 from game.entities import Plant
 from game.ui import Button
-from game.utils import (SPRITES_PATH, get_font)
+from game.utils import (ITEM_PATH, get_font)
 
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
@@ -76,11 +76,10 @@ class CraftingSystem:
             Plant.states["is_invincible"] += config.invincible_duration
 
         # 添加道具
-        ITEM_PATH = SPRITES_PATH + "/items"
-        self.items.append(Item("治愈药草", f'{ITEM_PATH}/heal.png', {'leafium': 10}, 10000, use_heal))
-        self.items.append(Item("加速鳄鱼", f'{ITEM_PATH}/croc.png', {'animite': 10}, 10000, use_speed))
-        self.items.append(Item("人工降雨", f'{ITEM_PATH}/rain.png', {'ecopoint': 10}, 10000, use_rain))
-        self.items.append(Item("植物护盾", f'{ITEM_PATH}/invincible.png', {'leafium': 10}, 10000, use_invincible))
+        self.items.append(Item("治愈药草", ITEM_PATH / 'heal.png', {'leafium': 10}, 10000, use_heal))
+        self.items.append(Item("加速鳄鱼", ITEM_PATH / 'croc.png', {'animite': 10}, 10000, use_speed))
+        self.items.append(Item("人工降雨", ITEM_PATH / 'rain.png', {'ecopoint': 10}, 10000, use_rain))
+        self.items.append(Item("植物护盾", ITEM_PATH / 'invincible.png', {'leafium': 10}, 10000, use_invincible))
 
         # 为每个道具分配两个按钮（制作 + 使用）
         x_start = 160

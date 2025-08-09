@@ -1,7 +1,7 @@
 # tech_tree.py
 import pygame
 from game.core import ResourceManager
-from game.utils import (SPRITES_PATH, color, sound_manager, get_font)
+from game.utils import (BUILDING_PATH, color, sound_manager, get_font)
 from game.entities import (Rabbit, Crocodile, Plant, Building)
 from game.environment import Season
 
@@ -71,11 +71,10 @@ class TechTree:
 
         self.rects = []  # 存储按钮区域（供点击判定）
 
-        building_path = SPRITES_PATH + "/buildings"
         self.buildings = {
-            "植物庇护站": Building("植物庇护站", f'{building_path}/plant_shelter.png', (200, 200), (200, 200)),
-            "动物缓冲地带": Building("动物缓冲地带", f'{building_path}/animal_zone.png', (width - 200, height - 300), (200, 200)),
-            "兔子哨站": Building("兔子哨站", f'{building_path}/rabbit_outpost.png', (200, height - 200), (200, 200)),
+            "植物庇护站": Building("植物庇护站", BUILDING_PATH / 'plant_shelter.png', (200, 200), (200, 200)),
+            "动物缓冲地带": Building("动物缓冲地带", BUILDING_PATH / 'animal_zone.png', (width - 200, height - 300), (200, 200)),
+            "兔子哨站": Building("兔子哨站", BUILDING_PATH / 'rabbit_outpost.png', (200, height - 200), (200, 200)),
         }
 
     def toggle(self) -> None:
