@@ -46,4 +46,5 @@ class SoundManager:
             for bgm in self.bgms:
                 self.sound_dict[bgm].stop()
 
+# 创建全局声音管理器实例
 sound_manager = SoundManager()

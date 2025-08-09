@@ -2,7 +2,7 @@
 import pygame
 import math
 import random
-from game.utils import (color, MapConfig, sound_manager)
+from game.utils import (color, MapConfig, sound_manager, get_font)
 
 class Season:
     config = None
@@ -18,7 +18,7 @@ class Season:
         self.color = self.COLORS[self.current]   # 当前季节颜色
         self.target_color = self.color           # 目标季节颜色
 
-        self.font = pygame.font.SysFont(font_name, font_size)
+        self.font = get_font(font_name, font_size)
         self.position = position
 
         self.min_duration = 6000           # 最短降雨时长

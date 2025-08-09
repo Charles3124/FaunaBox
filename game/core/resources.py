@@ -1,5 +1,6 @@
 # resources.py
 import pygame
+from game.utils import get_font
 
 class ResourceManager:
     eco_interval = 8000   # 随时间获得生态点
@@ -15,7 +16,7 @@ class ResourceManager:
         self.active_time = 0
         self.last_update_time = pygame.time.get_ticks()
 
-        self.font = pygame.font.SysFont(font_name, font_size)
+        self.font = get_font(font_name, font_size)
         self.position = position
 
     def gain_leafium(self, amount: int = 1) -> None:

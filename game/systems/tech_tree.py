@@ -1,7 +1,7 @@
 # tech_tree.py
 import pygame
 from game.core import ResourceManager
-from game.utils import (SPRITES_PATH, color, sound_manager)
+from game.utils import (SPRITES_PATH, color, sound_manager, get_font)
 from game.entities import (Rabbit, Crocodile, Plant, Building)
 from game.environment import Season
 
@@ -12,7 +12,7 @@ class TechTree:
         self.resource_manager = resource_manager   # 资源管理器
         self.width = width             # 屏幕宽度
         self.height = height           # 屏幕高度
-        self.font = pygame.font.SysFont(font_name, font_size)   # 创建字体
+        self.font = get_font(font_name, font_size)   # 创建字体
         self.visible = False           # 可见性
         self.unlock_message = None     # 解锁提示文字
         self.unlock_time = 0           # 解锁时间

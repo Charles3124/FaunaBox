@@ -4,7 +4,7 @@ from typing import Callable
 import pygame
 from game.entities import Plant
 from game.ui import Button
-from game.utils import SPRITES_PATH
+from game.utils import (SPRITES_PATH, get_font)
 
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
@@ -25,15 +25,15 @@ class Item:
 class CraftingSystem:
     RESOUCE_NAME = {'leafium': '绿素', 'animite': '兽能', 'ecopoint': '生态点'}
 
-    def __init__(self, world: World, width: int, height: int, font_name: str = "SimSun", font_size: int = 16):
+    def __init__(self, world: World, width: int, height: int):
         self.width = width
         self.height = height
         self.visible = False     # 是否展开道具界面
         self.world = world
         self.resource_manager = world.resource_manager
 
-        self.font = pygame.font.SysFont(font_name, font_size)
-        self.name_font = pygame.font.SysFont("SimSun", 16)
+        self.font = get_font("SimSun", 16)
+        self.name_font = get_font("SimSun", 16)
 
         self.items = []                        # 所有道具
         self.buttons = []                      # 所有按钮（仅创建一次）

@@ -3,7 +3,7 @@ from __future__ import annotations
 import pygame
 import math
 import random
-from game.utils import MapConfig
+from game.utils import (MapConfig, get_font)
 from .season import Season
 
 from typing import TYPE_CHECKING
@@ -13,7 +13,7 @@ if TYPE_CHECKING:
 class DisasterManager:
 
     def __init__(self, disaster_interval: int = 20000, font_name: str = "SimSun", font_size: int = 20):
-        self.font = pygame.font.SysFont(font_name, font_size)
+        self.font = get_font(font_name, font_size)
 
         self.disaster_interval = disaster_interval        # 灾害间隔
         self.active_time = 0                              # 活跃时间

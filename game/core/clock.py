@@ -1,6 +1,6 @@
 # clock.py
 import pygame
-from game.utils import color
+from game.utils import (color, get_font)
 
 class Clock:
     
@@ -10,7 +10,7 @@ class Clock:
         self.month_time = 5000
         self.speed = initial_speed
         self.speeds = speeds
-        self.font = pygame.font.SysFont('SimSun', 24)
+        self.font = get_font('SimSun', 24)
         self.last_update_time = pygame.time.get_ticks()
         self.elapsed_time = 0
 

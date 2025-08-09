@@ -2,7 +2,7 @@
 from __future__ import annotations
 from typing import Callable
 import pygame
-from game.utils import (color, sound_manager)
+from game.utils import (color, sound_manager, get_font)
 
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
@@ -30,7 +30,7 @@ class Button:
         self.text_color = text_color            # 文字颜色
         self.hovered = False                    # 悬停状态
 
-        self.font = pygame.font.SysFont(font_name, font_size)   # 创建字体
+        self.font = get_font(font_name, font_size)   # 创建字体
 
     def draw(self, screen: pygame.surface.Surface) -> None:
         """绘制按钮"""
