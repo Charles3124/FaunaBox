@@ -1,16 +1,23 @@
 # item.py
+"""游戏道具系统"""
+
 from __future__ import annotations
-from typing import Callable
+from typing import Callable, TYPE_CHECKING
+
 import pygame
+
 from game.entities import Plant
 from game.ui import Button
 from game.utils import (ITEM_PATH, get_font)
 
-from typing import TYPE_CHECKING
+
 if TYPE_CHECKING:
     from game.core import World
 
+
 class Item:
+    """定义道具属性"""
+
     def __init__(self, name: str, icon_path: str, cost: dict[str, int], craft_time: int, use_func: Callable[[], None]):
         self.name = name                 # 道具名称
         self.quantity = 0                # 道具数量
@@ -22,7 +29,10 @@ class Item:
         self.btn_craft = None            # 道具制作按钮
         self.btn_use = None              # 道具使用按钮
 
+
 class CraftingSystem:
+    """管理道具的生效效果、制作状态及其使用"""
+
     RESOUCE_NAME = {'leafium': '绿素', 'animite': '兽能', 'ecopoint': '生态点'}
 
     def __init__(self, world: World, width: int, height: int):

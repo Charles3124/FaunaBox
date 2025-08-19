@@ -1,16 +1,24 @@
 # animal.py
+"""创建和管理动物实体"""
+
 from __future__ import annotations
 from typing import Optional
-import pygame
 import random
 import math
+
+import pygame
+
 from game.utils import (MapConfig, RabbitConfig, CrocodileConfig)
 from game.core import ResourceManager
 from game.environment import Season
 
+
 AnimalConfig = RabbitConfig | CrocodileConfig
 
+
 class Animal:
+    """管理动物的创建、繁殖、死亡等事件"""
+
     loaded_images = {}
 
     def __init__(self, x: float, y: float, config: AnimalConfig):

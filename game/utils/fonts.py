@@ -1,7 +1,11 @@
 # fonts.py
+"""游戏字体系统"""
+
 import pygame
 
+
 class FontManager:
+    """创建并缓存字体"""
     
     def __init__(self):
         self.font_cache = {}
@@ -20,10 +24,11 @@ class FontManager:
         self.font_cache[cache_key] = font
         return font
 
+
 # 创建全局字体管理器实例
 font_manager = FontManager()
 
-# 提供快捷访问函数
+# 快捷访问函数
 def get_font(name: str = 'SimSun', size: int = 24, bold: bool = False) -> pygame.font.Font:
     """快捷获取字体对象的函数"""
     return font_manager.get_font(name, size, bold)

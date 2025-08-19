@@ -1,12 +1,17 @@
 # world.py
+"""游戏世界管理核心类"""
+
 import pygame
+
 from game.core import (Clock, ResourceManager)
 from game.utils import (RabbitConfig, CrocodileConfig, PlantConfig, SeasonConfig, draw_guide)
 from game.environment import (Season, DisasterManager)
 from game.systems import (CraftingSystem, TechTree)
 from game.entities import (Plant, Rabbit, Crocodile, Animal)
 
+
 class World:
+    """创建和管理游戏中的所有实体和系统"""
 
     def __init__(self, width: int, height: int, test_state: int = 0, initial_speed: int = 1, speeds: list[int] = [1, 2, 4]):
         # 基础状态
@@ -72,14 +77,28 @@ class World:
         self.crafting_system.update(self.clock.speed, self.pause)
 
         for animal in self.animals:
-            animal.move(self.animals, self.plants, self.season, self.dead_animals, self.plant_config, self.clock.speed, self.pause)
+            animal.move(
+                self.crocodiles, self.rabbits, self.dead_animals,
+                self.plants, self.plant_config,
+                self.season, self.clock.speed, self.pause
+            )
 
-        Plant.remove_plants_near_animals(self.plants, self.rabbits, self.season, self.resource_manager, self.clock.speed, self.pause)
+        Plant.remove_plants_near_animals(
+            self.plants, self.rabbits,
+            self.season, self.resource_manager, self.clock.speed, self.pause
+        )
 
     def update_when_active(self) -> None:
         """非暂停时更新"""
-        self.rabbits.extend(Rabbit.add_new_animal(self.rabbits, self.rabbit_config, self.animals, self.resource_manager, self.season))
-        self.crocodiles.extend(Crocodile.add_new_animal(self.crocodiles, self.croc_config, self.animals, self.resource_manager, self.season))
+        self.rabbits.extend(Rabbit.add_new_animal(
+            self.rabbits, self.rabbit_config, self.animals,
+            self.resource_manager, self.season
+        ))
+        
+        self.crocodiles.extend(Crocodile.add_new_animal(
+            self.crocodiles, self.croc_config, self.animals,
+            self.resource_manager, self.season
+        ))
 
         self.rabbits = Rabbit.remove_old_animals(self.rabbits)
         self.crocodiles = Crocodile.remove_old_animals(self.crocodiles)

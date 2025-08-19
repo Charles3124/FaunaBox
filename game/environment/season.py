@@ -1,10 +1,17 @@
 # season.py
-import pygame
+"""游戏季节和天气系统"""
+
 import math
 import random
+
+import pygame
+
 from game.utils import (color, MapConfig, sound_manager, get_font)
 
+
 class Season:
+    """管理四季更替、不定时降雨"""
+
     config = None
     SEASONS = ('春天', '夏天', '秋天', '冬天')
     COLORS = {"春天": color.LIGHT_GREEN, "夏天": color.LIGHT_YELLOW, "秋天": color.LIGHT_ORANGE, "冬天": color.PALE_BLUE}
@@ -88,7 +95,10 @@ class Season:
         self.is_raining = True
         self.rain_duration_timer = 0
         self.rain_duration = self.get_rain_duration()
-        self.raindrops = [{"x": random.randint(0, MapConfig.width), "y": random.randint(-200, 0), "speed": random.randint(5, 12)} for _ in range(150)]
+        self.raindrops = [
+            {"x": random.randint(0, MapConfig.width), "y": random.randint(-200, 0), "speed": random.randint(5, 12)}
+            for _ in range(150)
+        ]
         sound_manager.sound_dict['rain'].play(-1)
 
     def stop_rain(self) -> None:
@@ -154,9 +164,11 @@ class Season:
         """计算过渡颜色"""
         return tuple(int(c1[i] + (c2[i] - c1[i]) * t) for i in range(3))
 
+
 if __name__ == '__main__':
     import matplotlib.pyplot as plt
     from collections import Counter
+
 
     num = 10000
     season = Season()

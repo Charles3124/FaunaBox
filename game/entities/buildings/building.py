@@ -1,7 +1,11 @@
 # building.py
+"""游戏建筑系统"""
+
 import pygame
 
+
 class Building:
+    """创建和管理建筑实体"""
 
     def __init__(self, name: str, image_path: str, pos: tuple[int, int], size: tuple[int, int]):
         self.name = name

@@ -1,17 +1,24 @@
 # animal_species.py
+"""定义不同动物种类及行为"""
+
 from __future__ import annotations
 from typing import Optional
 import math
 import random
-import pygame
 import heapq
+
+import pygame
+
 from .animal import Animal
 from .plant import Plant
 from game.utils import (MapConfig, RabbitConfig, CrocodileConfig, PlantConfig)
 from game.environment import Season
 
+
 class Crocodile(Animal):
-    carnivore = True  # 食肉动物
+    """Animal 的子类，管理动物鳄鱼的移动、觅食等行为"""
+
+    carnivore = True   # 食肉动物标签
 
     def __init__(self, x: float, y: float, config: CrocodileConfig):
         super().__init__(x, y, config)
@@ -28,8 +35,8 @@ class Crocodile(Animal):
         self.full_speed_rate = 0.8   # 吃饱后移速的减少倍率
         self.rest_speed_rate = 0.6   # 游走时移速的减少倍率
 
-    def move(self, animals: list[Animal], plants: list[Plant], season: Season, dead_animals: Optional[list[Animal]],
-             plant_config: PlantConfig, time_speed: int, pause: bool) -> None:
+    def move(self, crocodiles: list[Crocodile], rabbits: list[Rabbit], dead_animals: Optional[list[Animal]],
+             plants: list[Plant], plant_config: PlantConfig, season: Season, time_speed: int, pause: bool) -> None:
         """鳄鱼移动"""
         # 活跃时间检查
         now = pygame.time.get_ticks()
@@ -63,7 +70,7 @@ class Crocodile(Animal):
         # --- 捕食或休息行为 ---
         # 饥饿时捕食
         if self.hungry:
-            prey = self._find_prey(animals, self.config.min_hunt_distance)
+            prey = self._find_prey(rabbits, self.config.min_hunt_distance)
             if prey:
                 self.angle = math.atan2(prey.y - self.y, prey.x - self.x)
                 self.angle += random.uniform(-math.pi / 8, math.pi / 8)
@@ -122,20 +129,22 @@ class Crocodile(Animal):
         self.x = max(self.size[0], min(MapConfig.width - self.size[0], self.x))
         self.y = max(self.size[1], min(MapConfig.height - self.size[1], self.y))
 
-    def _find_prey(self, animals: list[Animal], detection_radius: int) -> Rabbit | None:
+    def _find_prey(self, rabbits: list[Rabbit], detection_radius: int) -> Rabbit | None:
         """寻找附近的猎物 herbivore"""
         closest_prey = None
         closest_distance = float('inf')
 
-        for other in animals:
-            if getattr(other, "herbivore", False) and isinstance(other, Rabbit):
-                distance = math.hypot(self.x - other.x, self.y - other.y)
-                if distance < detection_radius and distance < closest_distance:
-                    closest_prey = other
-                    closest_distance = distance
+        for other in rabbits:
+            distance = math.hypot(self.x - other.x, self.y - other.y)
+            if distance < detection_radius and distance < closest_distance:
+                closest_prey = other
+                closest_distance = distance
         return closest_prey
 
+
 class Rabbit(Animal):
+    """Animal 的子类，管理动物兔子的移动、觅食等行为"""
+
     herbivore = True   # 食草动物
 
     def __init__(self, x: float, y: float, config: RabbitConfig):
@@ -153,8 +162,8 @@ class Rabbit(Animal):
         self.infected = False        # 是否感染
         self.immune = False          # 是否免疫传染病
 
-    def move(self, animals: list[Animal], plants: list[Plant], season: Season, dead_animals: Optional[list[Animal]],
-             plant_config: PlantConfig, time_speed: int, pause: bool) -> None:
+    def move(self, crocodiles: list[Crocodile], rabbits: list[Rabbit], dead_animals: Optional[list[Animal]],
+             plants: list[Plant], plant_config: PlantConfig, season: Season, time_speed: int, pause: bool) -> None:
         """兔子移动"""
         # 活跃时间检查
         now = pygame.time.get_ticks()
@@ -175,8 +184,8 @@ class Rabbit(Animal):
             self.age += delta_time * self.config.infected_multiplier  # 再额外增长一次，等效于寿命加倍流失
 
             # 检查传染给其他兔子
-            for other in animals:
-                if (other != self and isinstance(other, Rabbit) and not other.infected):
+            for other in rabbits:
+                if other != self and not other.infected:
                     dist = math.hypot(self.x - other.x, self.y - other.y)
                     if dist < self.config.infection_range:
                         other.infect(self.config.image_infected)
@@ -209,7 +218,7 @@ class Rabbit(Animal):
 
         # --- 优先级 ---
         # 最优先：找最近捕食者并远离
-        pre_center = self._find_predator(animals, self.config.min_croc_distance)
+        pre_center = self._find_predator(crocodiles, self.config.min_croc_distance)
         if pre_center:
             # 逃离方向（远离捕食者 + 预测）
             dx = self.x - pre_center[0]
@@ -251,8 +260,8 @@ class Rabbit(Animal):
 
         else:
             # 最低优先：避免同类过近
-            for other in animals:
-                if other != self and isinstance(other, Rabbit):
+            for other in rabbits:
+                if other != self:
                     dist = math.hypot(self.x - other.x, self.y - other.y)
                     if dist < self.config.min_distance:
                         avoid_angle = math.atan2(self.y - other.y, self.x - other.x)
@@ -291,19 +300,18 @@ class Rabbit(Animal):
         self.x = max(self.size[0], min(MapConfig.width - self.size[0], self.x))
         self.y = max(self.size[1], min(MapConfig.height - self.size[1], self.y))
 
-    def _find_predator(self, animals: list[Animal], detection_radius: int) -> tuple[float, float] | None:
+    def _find_predator(self, crocodiles: list[Crocodile], detection_radius: int) -> tuple[float, float] | None:
         """寻找最近的食肉动物 carnivore"""
         predators = []
         weights = []
         ε = 1e-3
 
-        for other in animals:
-            if getattr(other, 'carnivore', False):
-                distance = math.hypot(self.x - other.x, self.y - other.y)
-                if distance < detection_radius:
-                    weight = 1 / (distance**2 + ε)  # 越近权重越大
-                    predators.append((other.x, other.y, weight))
-                    weights.append(weight)
+        for other in crocodiles:
+            distance = math.hypot(self.x - other.x, self.y - other.y)
+            if distance < detection_radius:
+                weight = 1 / (distance**2 + ε)  # 越近权重越大
+                predators.append((other.x, other.y, weight))
+                weights.append(weight)
 
         if not predators:
             return None

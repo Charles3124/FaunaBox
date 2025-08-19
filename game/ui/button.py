@@ -1,17 +1,23 @@
 # button.py
+"""游戏 UI 系统"""
+
 from __future__ import annotations
-from typing import Callable
+from typing import Optional, Callable, TYPE_CHECKING
+
 import pygame
+
 from game.utils import (color, sound_manager, get_font)
 
-from typing import TYPE_CHECKING
+
 if TYPE_CHECKING:
     from game.core import World
 
+
 class Button:
+    """管理按钮的创建、鼠标事件"""
     
-    def __init__(self, rect_info: tuple[int, int, int, int], on_click: Callable | None = None, text: str | None = None,
-                 tooltip_text: str | None = None, tooltip_offset: tuple[int, int] | None = None,
+    def __init__(self, rect_info: tuple[int, int, int, int], on_click: Optional[Callable] = None, text: Optional[str] = None,
+                 tooltip_text: Optional[str] = None, tooltip_offset: Optional[tuple[int, int]] = None,
                  font_size: int = 20, font_name: str = "SimSun", display: bool = True,
                  color_idle: tuple[int, int, int] = color.LIGHT_SLATE_GRAY,
                  color_hover: tuple[int, int, int] = color.DIM_GRAY,
@@ -92,10 +98,12 @@ class Button:
                 sound_manager.sound_dict['click_settings1'].play()
                 self.on_click()
 
+
 def toggle_pause(world: World) -> None:
     """按钮响应函数：暂停"""
     if not world.tech_tree.visible and not world.guide_visible:
         world.pause = not world.pause
+
 
 def restart(world: World, width: int, height: int, set_buttons: Callable[[list[Button]], None]) -> list[Button]:
     """按钮响应函数：重置"""
@@ -103,6 +111,7 @@ def restart(world: World, width: int, height: int, set_buttons: Callable[[list[B
     sound_manager.play_random_bgm()
     world.restart()
     return create_ui_buttons(world, width, height, set_buttons)
+
 
 def toggle_tech(world: World) -> None:
     """按钮响应函数：打开科技树"""
@@ -113,6 +122,7 @@ def toggle_tech(world: World) -> None:
         world.pause = world.last_pause
     world.tech_tree.toggle()
 
+
 def toggle_guide(world: World) -> None:
     """按钮响应函数：打开指南"""
     if not world.guide_visible:
@@ -121,6 +131,7 @@ def toggle_guide(world: World) -> None:
     else:
         world.pause = world.last_pause_guide
     world.guide_visible = not world.guide_visible
+
 
 def create_ui_buttons(world: World, width: int, height: int, set_buttons: Callable[[list[Button]], None]) -> list[Button]:
     """创建按钮"""

@@ -1,8 +1,12 @@
 # main.py
+"""主函数，通过 World 类管理整个游戏"""
+
 import pygame
+
 from game.core import World
 from game.utils import (MapConfig, draw_centered_text, sound_manager)
 from game.ui import (Button, create_ui_buttons, toggle_pause, restart)
+
 
 # ---------- 初始化 ----------
 pygame.init()
@@ -14,13 +18,16 @@ pygame.display.set_caption("生态箱")
 world = World(WIDTH, HEIGHT, test_state=0)
 
 def set_buttons(new_buttons: list[Button]) -> None:
+    """创建 UI 按钮"""
     global buttons
     buttons = new_buttons
 buttons: list[Button] = create_ui_buttons(world, WIDTH, HEIGHT, set_buttons)
 
+
 # ---------- 主循环 ----------
 running = True
 sound_manager.play_random_bgm()
+
 while running:
     # 绘制背景颜色
     screen.fill(world.season.get_color())

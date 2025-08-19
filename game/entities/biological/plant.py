@@ -1,16 +1,24 @@
 # plant.py
+"""创建和管理植物实体"""
+
 from __future__ import annotations
-import pygame
+from typing import TYPE_CHECKING
 import random
+
+import pygame
+
 from game.utils import (MapConfig, PlantConfig)
 from game.core import ResourceManager
 from game.environment import Season
 
-from typing import TYPE_CHECKING
+
 if TYPE_CHECKING:
     from game.entities import Rabbit
 
+
 class Plant:
+    """管理植物的创建、繁殖、死亡等事件"""
+
     config: PlantConfig = None
     active_time = 0
     states = {

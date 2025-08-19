@@ -1,10 +1,16 @@
 # sounds.py
+"""游戏声音系统"""
+
 import os
-import pygame
 import random
+
+import pygame
+
 from game.utils import SOUNDS_PATH
 
+
 class SoundManager:
+    """管理声音播放、停止等事件"""
 
     def __init__(self, sound_folder: str = SOUNDS_PATH):
         pygame.mixer.init()
@@ -45,6 +51,7 @@ class SoundManager:
         if self.bgms_num > 0:
             for bgm in self.bgms:
                 self.sound_dict[bgm].stop()
+
 
 # 创建全局声音管理器实例
 sound_manager = SoundManager()

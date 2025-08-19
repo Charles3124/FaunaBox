@@ -1,16 +1,23 @@
 # disaster.py
+"""游戏灾害系统"""
+
 from __future__ import annotations
-import pygame
+from typing import TYPE_CHECKING
 import math
 import random
+
+import pygame
+
 from game.utils import (MapConfig, get_font)
 from .season import Season
 
-from typing import TYPE_CHECKING
+
 if TYPE_CHECKING:
     from game.core import World
 
+
 class DisasterManager:
+    """管理灾害开始、结束等事件"""
 
     def __init__(self, disaster_interval: int = 20000, font_name: str = "SimSun", font_size: int = 20):
         self.font = get_font(font_name, font_size)

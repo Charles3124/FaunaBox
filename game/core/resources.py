@@ -1,8 +1,14 @@
 # resources.py
+"""游戏资源系统"""
+
 import pygame
+
 from game.utils import get_font
 
+
 class ResourceManager:
+    """管理游戏资源，实现三类资源的获取"""
+
     eco_interval = 8000   # 随时间获得生态点
     
     def __init__(self, font_name: str = "SimSun", font_size: int = 20, position: tuple[int, int] = (500, 20), test: bool = False):

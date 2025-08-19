@@ -1,8 +1,13 @@
 # clock.py
+"""游戏时间系统"""
+
 import pygame
+
 from game.utils import (color, get_font)
 
+
 class Clock:
+    """管理游戏暂停、倍速等事件"""
     
     def __init__(self, initial_speed: int, speeds: list[int]):
         self.years = 0

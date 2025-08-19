@@ -17,10 +17,9 @@ FaunaBox/
 │   ├── utils/                 # 辅助函数与参数配置  
 │   │   └── config.py          # 所有生物与环境的参数配置  
 ├── tools/  
-├── main.py                    # 游戏主程序  
-├── balance.py                 # 数值平衡性模拟器  
-├── ecosystem_simulation.xlsx  # balance.py 导出的模拟数据  
+├── main.py                    # 游戏主程序   
 ├── README.md                  # 当前文档  
+├── requirements.txt           # 游戏所需库版本  
 ```
 
 ### 游戏机制简述

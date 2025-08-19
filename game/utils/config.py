@@ -1,24 +1,34 @@
 # config.py
+"""游戏实体和系统属性配置"""
+
 import math
 from dataclasses import dataclass, field
 from pathlib import Path
 
-BASE_PATH = Path("D:/My Programs/FaunaBox")
-SOUNDS_PATH = BASE_PATH / 'assets/sounds'
 
-SPRITES_PATH = BASE_PATH / 'assets/sprites'
-ANIMAL_PATH = SPRITES_PATH / 'animals'
-PLANT_PATH = SPRITES_PATH / 'plants'
-BUILDING_PATH = SPRITES_PATH / "buildings"
-ITEM_PATH = SPRITES_PATH / "items"
+# 游戏资源路径
+BASE_PATH = Path("D:/My Programs/FaunaBox")   # 根目录
+SOUNDS_PATH = BASE_PATH / 'assets/sounds'     # 声音资源
+
+SPRITES_PATH = BASE_PATH / 'assets/sprites'   # 图片资源根目录
+ANIMAL_PATH = SPRITES_PATH / 'animals'        # 动物图片资源
+PLANT_PATH = SPRITES_PATH / 'plants'          # 植物图片资源
+BUILDING_PATH = SPRITES_PATH / "buildings"    # 建筑图片资源
+ITEM_PATH = SPRITES_PATH / "items"            # 道具图片资源
+
 
 @dataclass
 class MapConfig:
+    """地图属性配置"""
+
     width: int = 1280   # 地图宽度
     height: int = 800   # 地图高度
 
+
 @dataclass
 class RabbitConfig:
+    """兔子属性配置"""
+    
     # 贴图
     image: str = ANIMAL_PATH / 'rabbit.png'   # 兔子贴图
     image_infected: str = ANIMAL_PATH / 'rabbit_infected.png'   # 感染兔子贴图
@@ -54,8 +64,11 @@ class RabbitConfig:
     infected_multiplier: int = 2        # 感染后寿命流失倍速
     infection_speed_down: float = 0.3   # 感染后速度降低
 
+
 @dataclass
 class CrocodileConfig:
+    """鳄鱼属性配置"""
+
     # 贴图
     image: str = ANIMAL_PATH / 'crocodile.png'   # 鳄鱼贴图
 
@@ -83,8 +96,11 @@ class CrocodileConfig:
     boost_rate: float = 2             # 加速比例
     boost_duration: int = 10000       # 加速时长
 
+
 @dataclass
 class PlantConfig:
+    """植物属性配置"""
+
     # 贴图
     image: str = PLANT_PATH / 'grass.png'     # 植物贴图
     image_medicative: str = PLANT_PATH / 'grass_medicative.png'   # 治愈性植物贴图
@@ -118,8 +134,11 @@ class PlantConfig:
     is_invincible: bool = False        # 是否有护盾
     invincible_duration: int = 10000   # 护盾时间
 
+
 @dataclass
 class SeasonConfig:
+    """季节属性配置"""
+
     switch_interval: int = 15000    # 季节切换间隔
     speed_multipliers: dict = field(default_factory=lambda: {'春天': 1.0, '夏天': 1.1, '秋天': 1.0, '冬天': 0.6})  # 四季动物移速倍率
     interval_multipliers: dict = field(default_factory=lambda: {'春天': 0.75, '夏天': 1.0, '秋天': 1.25, '冬天': 2.0})  # 四季植物生长倍率

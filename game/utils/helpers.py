@@ -1,12 +1,18 @@
 # helpers.py
+"""游戏文字绘制"""
+
 from __future__ import annotations
+from typing import TYPE_CHECKING
+
 import pygame
+
 from game.utils import (color, MapConfig)
 from .fonts import get_font
 
-from typing import TYPE_CHECKING
+
 if TYPE_CHECKING:
     from game.core import Clock
+
 
 def draw_centered_text(screen: pygame.surface.Surface, clock: Clock, text: str, y_offset: int = 0,
                        text_color: tuple[int, int, int] = color.BLACK, font_name: str = "SimSun") -> None:
@@ -26,6 +32,7 @@ def draw_centered_text(screen: pygame.surface.Surface, clock: Clock, text: str, 
     y = (MapConfig.height - text_surface.get_height()) // 2 + y_offset + 60
 
     screen.blit(text_surface, (x, y))
+
 
 def draw_guide(screen: pygame.surface.Surface) -> None:
     """绘制指南界面"""

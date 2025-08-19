@@ -1,11 +1,17 @@
 # tech_tree.py
+"""游戏科技树系统"""
+
 import pygame
+
 from game.core import ResourceManager
 from game.utils import (BUILDING_PATH, color, sound_manager, get_font)
 from game.entities import (Rabbit, Crocodile, Plant, Building)
 from game.environment import Season
 
+
 class TechTree:
+    """管理科技树的生效效果、生效状态"""
+
     RESOUCE_NAME = {'leafium': '绿素', 'animite': '兽能', 'ecopoint': '生态点'}
 
     def __init__(self, resource_manager: ResourceManager, width: int, height: int, font_name: str = "SimSun", font_size: int = 20):

@@ -1,7 +1,13 @@
 import math
-import pandas as pd
 from dataclasses import dataclass
-from game.utils.config import MapConfig, RabbitConfig, CrocodileConfig, PlantConfig, SeasonConfig
+import sys
+from pathlib import Path
+sys.path.append(str(Path(__file__).parent.parent))
+
+import pandas as pd
+
+from game.utils.config import (MapConfig, RabbitConfig, CrocodileConfig, PlantConfig, SeasonConfig)
+
 
 # 配置加载
 map_cfg = MapConfig()
@@ -40,8 +46,8 @@ rabbit_death_acc = Accumulator()
 croc_birth_acc = Accumulator()
 croc_death_acc = Accumulator()
 
-# 吃植物估算
 def estimate_plant_eaten(plant_count, rabbit_count, min_plant_distance, speed):
+    """兔子吃植物数量估算"""
     effective_area = math.pi * min_plant_distance ** 2 + 2 * min_plant_distance * speed * SEASON_DURATION
     plant_density = plant_count / MAP_AREA
     plants_per_rabbit = effective_area * plant_density
@@ -108,5 +114,5 @@ for i in range(SEASON_NUM):
 
 # 保存
 df = pd.DataFrame(data)
-df.to_excel("ecosystem_simulation.xlsx", index=False)
+df.to_excel("tools/ecosystem_simulation.xlsx", index=False)
 print(df)
