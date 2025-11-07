@@ -26,6 +26,7 @@ def set_buttons(new_buttons: list[Button]) -> None:
     """创建 UI 按钮"""
     global buttons
     buttons = new_buttons
+
 buttons: list[Button] = create_ui_buttons(world, WIDTH, HEIGHT, set_buttons)
 
 
@@ -82,15 +83,16 @@ while running:
 
     # 显示结局
     if world.ending1:
-        draw_centered_text(screen, world.clock, "植物灭绝了！", y_offset=-20)
+        draw_centered_text(screen, world.clock, text="植物灭绝了！", y_offset=-20)
     elif world.ending2:
-        draw_centered_text(screen, world.clock, "兔子灭绝了！", y_offset=-20)
+        draw_centered_text(screen, world.clock, text="兔子灭绝了！", y_offset=-20)
     elif world.ending3:
-        draw_centered_text(screen, world.clock, "鳄鱼灭绝了！", y_offset=-20)
+        draw_centered_text(screen, world.clock, text="鳄鱼灭绝了！", y_offset=-20)
 
     # 更新一帧画面
     pygame.display.flip()
     pygame.time.Clock().tick(60)
+
 
 sound_manager.stop_all_bgm()
 pygame.quit()

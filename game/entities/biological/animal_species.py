@@ -102,8 +102,8 @@ class Crocodile(Animal):
 
             # 判断是否在边缘
             is_near_edge = (
-                self.x < self.edge_margin or self.x > MapConfig.width - self.edge_margin or
-                self.y < self.edge_margin or self.y > MapConfig.height - self.edge_margin
+                self.x < self.edge_margin or self.x > MapConfig.width - self.edge_margin
+                or self.y < self.edge_margin or self.y > MapConfig.height - self.edge_margin
             )
 
             # 前往最近边缘

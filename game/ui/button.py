@@ -22,7 +22,8 @@ class Button:
     """管理按钮的创建、鼠标事件"""
     
     def __init__(
-            self, rect_info: tuple[int, int, int, int], on_click: Optional[Callable] = None, text: Optional[str] = None,
+            self, rect_info: tuple[int, int, int, int],
+            on_click: Optional[Callable] = None, text: Optional[str | Callable[[], str]] = None,
             tooltip_text: Optional[str] = None, tooltip_offset: Optional[tuple[int, int]] = None,
             font_size: int = 20, font_name: str = "SimSun", display: bool = True,
             color_idle: tuple[int, int, int] = color.LIGHT_SLATE_GRAY,
@@ -43,7 +44,7 @@ class Button:
         self.text_color = text_color            # 文字颜色
         self.hovered = False                    # 悬停状态
 
-        self.font = get_font(font_name, font_size)   # 创建字体
+        self.font = get_font(name=font_name, size=font_size)   # 创建字体
 
     def draw(self, screen: pygame.surface.Surface) -> None:
         """绘制按钮"""
