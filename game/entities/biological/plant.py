@@ -65,7 +65,7 @@ class Plant:
         """控制植物距离"""
         for plant in plants:
             distance = (new_plant.x - plant.x) ** 2 + (new_plant.y - plant.y) ** 2
-            if distance < Plant.config.min_distance ** 2:
+            if distance < Plant.config.min_distance_square:
                 return True
         return False
 
@@ -209,7 +209,7 @@ class Plant:
         for animal in animals:
             if getattr(animal, "herbivore", False):
                 distance = (plant.x - animal.x) ** 2 + (plant.y - animal.y) ** 2
-                if distance < Plant.config.min_animal_distance ** 2:
+                if distance < Plant.config.min_animal_distance_square:
                     return animal
         return None
 

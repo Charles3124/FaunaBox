@@ -20,7 +20,7 @@ screen = pygame.display.set_mode((WIDTH, HEIGHT))
 pygame.display.set_caption("生态箱")
 
 # 创建世界和 UI 按钮
-world = World(WIDTH, HEIGHT, test_state=0)
+world = World(WIDTH, HEIGHT, test_state=1)
 
 def set_buttons(new_buttons: list[Button]) -> None:
     """创建 UI 按钮"""

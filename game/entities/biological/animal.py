@@ -75,8 +75,8 @@ class Animal:
     def _is_too_close_a(cls, new_animal: Animal, animals: list[Animal], config: AnimalConfig) -> bool:
         """控制动物距离"""
         for animal in animals:
-            distance = (new_animal.x - animal.x)**2 + (new_animal.y - animal.y)**2
-            if distance < config.min_distance**2:
+            distance = (new_animal.x - animal.x) ** 2 + (new_animal.y - animal.y) ** 2
+            if distance < config.min_distance_square:
                 return True
         return False
 
@@ -103,7 +103,7 @@ class Animal:
     def add_new_animal(
             cls, animals: list[Animal], config: AnimalConfig, all_animals: list[Animal],
             resource_manager: ResourceManager, season: Season
-    ) -> Animal:
+    ) -> list[Animal]:
         """动物繁殖"""
         new_animals = []
         target_eaten = config.reproduction_threshold[season.current]
@@ -112,7 +112,7 @@ class Animal:
             if animal.eaten >= target_eaten:
                 animal.eaten -= target_eaten
 
-                if getattr(animal, 'herbivore', False):
+                if getattr(animal, "herbivore", False):
                     animal.energy = 0
                 
                 for _ in range(100):
@@ -123,7 +123,7 @@ class Animal:
                         resource_manager.gain_animite(config.reproduction_resource)
                         break
 
-        return new_animals[0]
+        return new_animals
 
     @classmethod
     def boost_speed(cls, config: AnimalConfig) -> None:

@@ -47,6 +47,8 @@ class RabbitConfig:
     min_plant_distance_infected: int = 150   # 寻找治愈性药草的范围
     min_croc_distance: int = 200      # 躲避鳄鱼的范围
 
+    min_distance_square: int = min_distance ** 2
+
     ave_speed: float = 0.9            # 速度平均值
     range_speed: float = 0.2          # 速度范围
     speed_change_rate: float = 0.05           # 速度随机变化范围
@@ -85,6 +87,8 @@ class CrocodileConfig:
     min_hunt_distance: int = 500      # 觅食范围
     min_eat_distance: int = 40        # 进食范围
 
+    min_distance_square: int = min_distance ** 2
+
     ave_speed: float = 1.2            # 速度平均值
     range_speed: float = 0.2          # 速度范围
     speed_change_rate: float = 0.05           # 速度随机变化范围
@@ -116,6 +120,9 @@ class PlantConfig:
 
     min_distance: int = 50             # 植物间最小距离
     min_animal_distance: int = 20      # 被吃范围
+
+    min_distance_square: int = min_distance ** 2
+    min_animal_distance_square: int = min_animal_distance ** 2
 
     reproduction_interval: int = 2000  # 繁殖时间间隔
 

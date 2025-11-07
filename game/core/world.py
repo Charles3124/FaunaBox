@@ -23,17 +23,17 @@ class World:
             initial_speed: int = 1, speeds: tuple[int, ...] = (1, 2, 4)
     ):
         # 基础状态
-        self.width = width
-        self.height = height
-        self.pause = False
-        self.end = False
-        self.ending1 = False
-        self.ending2 = False
-        self.ending3 = False
+        self.width = width      # 地图宽度
+        self.height = height    # 地图高度
+        self.pause = False      # 世界暂停状态
+        self.end = False        # 世界结束状态
+        self.ending1 = False    # 结局 1
+        self.ending2 = False    # 结局 2
+        self.ending3 = False    # 结局 3
 
-        self.last_pause = None
-        self.guide_visible = False
-        self.last_pause_guide = None
+        self.last_pause = None         # 上次暂停状态
+        self.guide_visible = False     # 指南可见性
+        self.last_pause_guide = None   # 上次指南暂停状态
 
         # 配置和系统初始化（时间、季节、灾害、资源）
         self.clock = Clock(initial_speed, speeds)
@@ -93,7 +93,8 @@ class World:
 
         Plant.remove_plants_near_animals(
             self.plants, self.rabbits,
-            self.season, self.resource_manager, self.clock.speed, self.pause
+            self.season, self.resource_manager,
+            self.clock.speed, self.pause
         )
 
     def update_when_active(self) -> None:
