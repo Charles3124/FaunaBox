@@ -1,5 +1,10 @@
-# world.py
-"""游戏世界管理核心类"""
+"""
+world.py
+
+功能: 游戏世界管理核心类
+时间: 2025/11/07
+版本: 1.0
+"""
 
 import pygame
 
@@ -13,7 +18,10 @@ from game.entities import (Plant, Rabbit, Crocodile, Animal)
 class World:
     """创建和管理游戏中的所有实体和系统"""
 
-    def __init__(self, width: int, height: int, test_state: int = 0, initial_speed: int = 1, speeds: list[int] = [1, 2, 4]):
+    def __init__(
+            self, width: int, height: int, test_state: int = 0,
+            initial_speed: int = 1, speeds: tuple[int, ...] = (1, 2, 4)
+    ):
         # 基础状态
         self.width = width
         self.height = height

@@ -1,5 +1,10 @@
-# clock.py
-"""游戏时间系统"""
+"""
+clock.py
+
+功能: 游戏时间系统
+时间: 2025/11/07
+版本: 1.0
+"""
 
 import pygame
 
@@ -9,13 +14,13 @@ from game.utils import (color, get_font)
 class Clock:
     """管理游戏暂停、倍速等事件"""
     
-    def __init__(self, initial_speed: int, speeds: list[int]):
+    def __init__(self, initial_speed: int, speeds: tuple[int, ...]):
         self.years = 0
         self.months = 3
         self.month_time = 5000
         self.speed = initial_speed
         self.speeds = speeds
-        self.font = get_font('SimSun', 24)
+        self.font = get_font(name='SimSun', size=24)
         self.last_update_time = pygame.time.get_ticks()
         self.elapsed_time = 0
 

@@ -1,5 +1,10 @@
-# config.py
-"""游戏实体和系统属性配置"""
+"""
+config.py
+
+功能: 游戏实体和系统属性配置
+时间: 2025/11/07
+版本: 1.0
+"""
 
 import math
 from dataclasses import dataclass, field
@@ -8,11 +13,11 @@ from pathlib import Path
 
 # 游戏资源路径
 BASE_PATH = Path("D:/My Programs/FaunaBox")   # 根目录
-SOUNDS_PATH = BASE_PATH / 'assets/sounds'     # 声音资源
+SOUNDS_PATH = BASE_PATH / "assets/sounds"     # 声音资源
 
-SPRITES_PATH = BASE_PATH / 'assets/sprites'   # 图片资源根目录
-ANIMAL_PATH = SPRITES_PATH / 'animals'        # 动物图片资源
-PLANT_PATH = SPRITES_PATH / 'plants'          # 植物图片资源
+SPRITES_PATH = BASE_PATH / "assets/sprites"   # 图片资源根目录
+ANIMAL_PATH = SPRITES_PATH / "animals"        # 动物图片资源
+PLANT_PATH = SPRITES_PATH / "plants"          # 植物图片资源
 BUILDING_PATH = SPRITES_PATH / "buildings"    # 建筑图片资源
 ITEM_PATH = SPRITES_PATH / "items"            # 道具图片资源
 
@@ -30,8 +35,8 @@ class RabbitConfig:
     """兔子属性配置"""
     
     # 贴图
-    image: str = ANIMAL_PATH / 'rabbit.png'   # 兔子贴图
-    image_infected: str = ANIMAL_PATH / 'rabbit_infected.png'   # 感染兔子贴图
+    image: str = ANIMAL_PATH / "rabbit.png"   # 兔子贴图
+    image_infected: str = ANIMAL_PATH / "rabbit_infected.png"   # 感染兔子贴图
 
     # 基础属性
     initial_num: int = 8              # 初始数量
@@ -49,7 +54,7 @@ class RabbitConfig:
     plant_eat_boost: float = 0.15     # 吃植物加速幅度
     max_eat_boost: int = 2            # 吃植物的最大加速次数
 
-    reproduction_threshold: dict = field(default_factory=lambda: {'春天': 3, '夏天': 3, '秋天': 3, '冬天': 4})  # 四季兔子的繁殖阈值
+    reproduction_threshold: dict = field(default_factory=lambda: {"春天": 3, "夏天": 3, "秋天": 3, "冬天": 4})  # 四季兔子的繁殖阈值
     reproduction_resource: int = 3    # 繁殖时增加的资源
 
     ave_age: int = 3                  # 年龄平均值
@@ -70,7 +75,7 @@ class CrocodileConfig:
     """鳄鱼属性配置"""
 
     # 贴图
-    image: str = ANIMAL_PATH / 'crocodile.png'   # 鳄鱼贴图
+    image: str = ANIMAL_PATH / "crocodile.png"   # 鳄鱼贴图
 
     # 基础属性
     initial_num: int = 2              # 初始数量
@@ -85,7 +90,7 @@ class CrocodileConfig:
     speed_change_rate: float = 0.05           # 速度随机变化范围
     angle_change_rate: float = math.pi / 12   # 角度随机变化范围
 
-    reproduction_threshold: dict = field(default_factory=lambda: {'春天': 6, '夏天': 6, '秋天': 6, '冬天': 6})  # 四季鳄鱼的繁殖阈值
+    reproduction_threshold: dict = field(default_factory=lambda: {"春天": 6, "夏天": 6, "秋天": 6, "冬天": 6})  # 四季鳄鱼的繁殖阈值
     reproduction_resource: int = 5    # 繁殖时增加的资源
 
     ave_age: int = 4                  # 年龄平均值
@@ -102,8 +107,8 @@ class PlantConfig:
     """植物属性配置"""
 
     # 贴图
-    image: str = PLANT_PATH / 'grass.png'     # 植物贴图
-    image_medicative: str = PLANT_PATH / 'grass_medicative.png'   # 治愈性植物贴图
+    image: str = PLANT_PATH / "grass.png"     # 植物贴图
+    image_medicative: str = PLANT_PATH / "grass_medicative.png"   # 治愈性植物贴图
 
     # 基础属性
     initial_num: int = 20              # 初始数量
@@ -140,6 +145,6 @@ class SeasonConfig:
     """季节属性配置"""
 
     switch_interval: int = 15000    # 季节切换间隔
-    speed_multipliers: dict = field(default_factory=lambda: {'春天': 1.0, '夏天': 1.1, '秋天': 1.0, '冬天': 0.6})  # 四季动物移速倍率
-    interval_multipliers: dict = field(default_factory=lambda: {'春天': 0.75, '夏天': 1.0, '秋天': 1.25, '冬天': 2.0})  # 四季植物生长倍率
+    speed_multipliers: dict = field(default_factory=lambda: {"春天": 1.0, "夏天": 1.1, "秋天": 1.0, "冬天": 0.6})  # 四季动物移速倍率
+    interval_multipliers: dict = field(default_factory=lambda: {"春天": 0.75, "夏天": 1.0, "秋天": 1.25, "冬天": 2.0})  # 四季植物生长倍率
     rain_probability: float = 0.25  # 降雨概率

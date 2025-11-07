@@ -1,5 +1,10 @@
-# tech_tree.py
-"""游戏科技树系统"""
+"""
+tech_tree.py
+
+功能: 游戏科技树系统
+时间: 2025/11/07
+版本: 1.0
+"""
 
 import pygame
 
@@ -12,9 +17,12 @@ from game.environment import Season
 class TechTree:
     """管理科技树的生效效果、生效状态"""
 
-    RESOUCE_NAME = {'leafium': '绿素', 'animite': '兽能', 'ecopoint': '生态点'}
+    RESOUCE_NAME = {"leafium": "绿素", "animite": "兽能", "ecopoint": "生态点"}
 
-    def __init__(self, resource_manager: ResourceManager, width: int, height: int, font_name: str = "SimSun", font_size: int = 20):
+    def __init__(
+            self, resource_manager: ResourceManager, width: int, height: int,
+            font_name: str = "SimSun", font_size: int = 20
+    ):
         self.resource_manager = resource_manager   # 资源管理器
         self.width = width             # 屏幕宽度
         self.height = height           # 屏幕高度
@@ -75,12 +83,21 @@ class TechTree:
             "兔子哨站": "扩大兔子感知掠食者的范围",
         }
 
-        self.rects = []  # 存储按钮区域（供点击判定）
+        self.rects = []  # 存储按钮区域
 
         self.buildings = {
-            "植物庇护站": Building("植物庇护站", BUILDING_PATH / 'plant_shelter.png', (200, 200), (200, 200)),
-            "动物缓冲地带": Building("动物缓冲地带", BUILDING_PATH / 'animal_zone.png', (width - 200, height - 300), (200, 200)),
-            "兔子哨站": Building("兔子哨站", BUILDING_PATH / 'rabbit_outpost.png', (200, height - 200), (200, 200)),
+            "植物庇护站": Building(
+                name="植物庇护站", image_path=BUILDING_PATH / "plant_shelter.png",
+                pos=(200, 200), size=(200, 200)
+            ),
+            "动物缓冲地带": Building(
+                name="动物缓冲地带", image_path=BUILDING_PATH / "animal_zone.png",
+                pos=(width - 200, height - 300), size=(200, 200)
+            ),
+            "兔子哨站": Building(
+                name="兔子哨站", image_path=BUILDING_PATH / "rabbit_outpost.png",
+                pos=(200, height - 200), size=(200, 200)
+            ),
         }
 
     def toggle(self) -> None:
@@ -112,56 +129,56 @@ class TechTree:
             setattr(self.resource_manager, key, getattr(self.resource_manager, key) - value)
         tech["unlocked"] = True
         self.apply_effects()
-        self.unlock_message = f"科技已解锁：{tech['name']}！"  # 解锁提示
+        self.unlock_message = f"科技已解锁：{tech["name"]}！"  # 解锁提示
         self.unlock_time = pygame.time.get_ticks()
 
     def apply_effects(self) -> None:
         """根据已解锁科技，修改系统配置"""
         for area, techs in self.techs.items():
             for i, tech in enumerate(techs):
-                if tech['unlocked'] and not tech['applied']:
-                    sound_manager.sound_dict['click_tech'].play()
-                    name = tech['name']
+                if tech["unlocked"] and not tech["applied"]:
+                    sound_manager.sound_dict["click_tech"].play()
+                    name = tech["name"]
 
                     # 植物科技
-                    if name == '繁殖加速-α型':    # 繁殖加速-α型：略微提高植物的繁殖速度
+                    if name == "繁殖加速-α型":    # 繁殖加速-α型：略微提高植物的繁殖速度
                         Plant.config.reproduction_interval -= 500
-                    elif name == '繁殖加速-β型':  # 繁殖加速-β型：植物每次有概率双倍繁殖
+                    elif name == "繁殖加速-β型":  # 繁殖加速-β型：植物每次有概率双倍繁殖
                         Plant.config.double_reproduction = True
-                    elif name == '亲水基因':      # 亲水基因：植物在下雨时繁殖更快，但冬天更容易死亡
+                    elif name == "亲水基因":      # 亲水基因：植物在下雨时繁殖更快，但冬天更容易死亡
                         Plant.config.rain_bonus = 0.5
                         Plant.config.winter_harshness = 1.5
-                    elif name == '耐寒基因':      # 耐寒基因：植物在冬天不再因严寒而死亡
+                    elif name == "耐寒基因":      # 耐寒基因：植物在冬天不再因严寒而死亡
                         Plant.config.survive_winter = True
 
                     # 动物科技
-                    elif name == '兔子：速度增强':  # 兔子：速度增强：兔子速度更快，但觅食范围略微缩小
+                    elif name == "兔子：速度增强":  # 兔子：速度增强：兔子速度更快，但觅食范围略微缩小
                         Rabbit.config.ave_speed += 0.2
                         Rabbit.config.min_plant_distance -= 10
-                    elif name == '兔子：繁殖季':    # 兔子：繁殖季：春天兔子繁殖更快
-                        Rabbit.config.reproduction_threshold['春天'] -= 1
-                    elif name == '鳄鱼：节育本能':  # 鳄鱼：节育本能：鳄鱼需要多吃一只兔子才能繁殖
-                        for s in ('春天', '夏天', '秋天', '冬天'):
+                    elif name == "兔子：繁殖季":    # 兔子：繁殖季：春天兔子繁殖更快
+                        Rabbit.config.reproduction_threshold["春天"] -= 1
+                    elif name == "鳄鱼：节育本能":  # 鳄鱼：节育本能：鳄鱼需要多吃一只兔子才能繁殖
+                        for s in ("春天", "夏天", "秋天", "冬天"):
                             Crocodile.config.reproduction_threshold[s] += 1
-                    elif name == '鳄鱼：咬合进化':  # 鳄鱼：咬合进化：鳄鱼的捕食范围变大
+                    elif name == "鳄鱼：咬合进化":  # 鳄鱼：咬合进化：鳄鱼的捕食范围变大
                         Crocodile.config.min_eat_distance += 10
 
                     # 天气科技
-                    elif name == '生态调节系统':  # 生态调节系统：生态点增长得更快
+                    elif name == "生态调节系统":  # 生态调节系统：生态点增长得更快
                         ResourceManager.eco_interval -= 3000
-                    elif name == '季节稳定系统':  # 季节稳定系统：每个季节延长 5 秒
+                    elif name == "季节稳定系统":  # 季节稳定系统：每个季节延长 5 秒
                         Season.config.switch_interval += 5000
-                    elif name == '降雨干预系统':  # 降雨干预系统：全年降雨增多
+                    elif name == "降雨干预系统":  # 降雨干预系统：全年降雨增多
                         Season.config.rain_probability = 0.4
 
                     # 建筑科技
-                    elif name == '植物庇护站':  # 植物庇护站：植物在冬天的繁殖速度更快
-                        Season.config.interval_multipliers['冬天'] = 1.5
+                    elif name == "植物庇护站":  # 植物庇护站：植物在冬天的繁殖速度更快
+                        Season.config.interval_multipliers["冬天"] = 1.5
                         self.buildings[name].visible = True
-                    elif name == '动物缓冲地带':  # 动物缓冲地带：动物在冬天的移速略微增加
-                        Season.config.speed_multipliers['冬天'] = 0.8
+                    elif name == "动物缓冲地带":  # 动物缓冲地带：动物在冬天的移速略微增加
+                        Season.config.speed_multipliers["冬天"] = 0.8
                         self.buildings[name].visible = True
-                    elif name == '兔子哨站':    # 兔子哨站：扩大兔子感知掠食者的范围
+                    elif name == "兔子哨站":    # 兔子哨站：扩大兔子感知掠食者的范围
                         Rabbit.config.min_croc_distance += 50
                         self.buildings[name].visible = True
                     
@@ -198,7 +215,10 @@ class TechTree:
 
             for i, tech in enumerate(techs):
                 # 拼接科技名和消耗文本
-                tech_text = f"{tech['name']} - " + ", ".join([f"{self.RESOUCE_NAME[k]}：{v}" for k, v in tech['cost'].items()])
+                tech_text = f"{tech["name"]} - " + ", ".join([
+                    f"{self.RESOUCE_NAME[k]}：{v}"
+                    for k, v in tech["cost"].items()
+                ])
                 text_surface = self.font.render(tech_text, True, (0, 0, 0))
 
                 # 动态获取文本宽度
@@ -208,7 +228,7 @@ class TechTree:
                 # 绘制背景框
                 rect = pygame.Rect(base_x, base_y + i * spacing_y, box_width, box_height)
 
-                if tech['unlocked']:
+                if tech["unlocked"]:
                     cur_color = self.color_unlocked
                 elif self.hovered_index == (area, i):
                     cur_color = self.color_hover
@@ -250,7 +270,7 @@ class TechTree:
         for rect, area, index in self.rects:
             if rect.collidepoint(mouse_pos):
                 tech = self.techs[area][index]
-                desc = self.tooltips.get(tech['name'], "")
+                desc = self.tooltips.get(tech["name"], "")
                 if desc:
                     # 渲染文本
                     text_surf = self.font.render(desc, True, (0, 0, 0))

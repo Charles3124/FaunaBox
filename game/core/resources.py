@@ -1,5 +1,10 @@
-# resources.py
-"""游戏资源系统"""
+"""
+resources.py
+
+功能: 游戏资源系统
+时间: 2025/11/07
+版本: 1.0
+"""
 
 import pygame
 
@@ -11,7 +16,10 @@ class ResourceManager:
 
     eco_interval = 8000   # 随时间获得生态点
     
-    def __init__(self, font_name: str = "SimSun", font_size: int = 20, position: tuple[int, int] = (500, 20), test: bool = False):
+    def __init__(
+            self, font_name: str = "SimSun", font_size: int = 20,
+            position: tuple[int, int] = (500, 20), test: int = 0
+    ):
         self.leafium = 0    # 绿素：植物贡献
         self.animite = 0    # 兽能：动物贡献
         self.ecopoint = 0   # 生态点：时间线性增长

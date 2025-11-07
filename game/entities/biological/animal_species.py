@@ -1,5 +1,10 @@
-# animal_species.py
-"""定义不同动物种类及行为"""
+"""
+animal_species.py
+
+功能: 定义不同动物种类及行为
+时间: 2025/11/07
+版本: 1.0
+"""
 
 from __future__ import annotations
 from typing import Optional
@@ -35,8 +40,12 @@ class Crocodile(Animal):
         self.full_speed_rate = 0.8   # 吃饱后移速的减少倍率
         self.rest_speed_rate = 0.6   # 游走时移速的减少倍率
 
-    def move(self, crocodiles: list[Crocodile], rabbits: list[Rabbit], dead_animals: Optional[list[Animal]],
-             plants: list[Plant], plant_config: PlantConfig, season: Season, time_speed: int, pause: bool) -> None:
+    def move(
+            self, crocodiles: list[Crocodile], rabbits: list[Rabbit],
+            dead_animals: Optional[list[Animal]],
+            plants: list[Plant], plant_config: PlantConfig,
+            season: Season, time_speed: int, pause: bool
+    ) -> None:
         """鳄鱼移动"""
         # 活跃时间检查
         now = pygame.time.get_ticks()
@@ -67,7 +76,7 @@ class Crocodile(Animal):
             self.boost_active_time = 0
             self.config.boosting = False
 
-        # --- 捕食或休息行为 ---
+        # ----- 捕食或休息行为 -----
         # 饥饿时捕食
         if self.hungry:
             prey = self._find_prey(rabbits, self.config.min_hunt_distance)
@@ -113,7 +122,7 @@ class Crocodile(Animal):
                 self.active_time = 0
                 self.hungry = True  # 进入下一轮捕食
 
-        # --- 执行移动 ---
+        # ----- 执行移动 -----
         dx = self.speed * math.cos(self.angle)
         dy = self.speed * math.sin(self.angle)
 
@@ -162,8 +171,12 @@ class Rabbit(Animal):
         self.infected = False        # 是否感染
         self.immune = False          # 是否免疫传染病
 
-    def move(self, crocodiles: list[Crocodile], rabbits: list[Rabbit], dead_animals: Optional[list[Animal]],
-             plants: list[Plant], plant_config: PlantConfig, season: Season, time_speed: int, pause: bool) -> None:
+    def move(
+            self, crocodiles: list[Crocodile], rabbits: list[Rabbit],
+            dead_animals: Optional[list[Animal]],
+             plants: list[Plant], plant_config: PlantConfig,
+            season: Season, time_speed: int, pause: bool
+    ) -> None:
         """兔子移动"""
         # 活跃时间检查
         now = pygame.time.get_ticks()
@@ -216,7 +229,7 @@ class Rabbit(Animal):
             self.boost_active_time = 0
             self.config.boosting = False
 
-        # --- 优先级 ---
+        # ----- 优先级 -----
         # 最优先：找最近捕食者并远离
         pre_center = self._find_predator(crocodiles, self.config.min_croc_distance)
         if pre_center:
@@ -284,7 +297,7 @@ class Rabbit(Animal):
                     self.angle = math.atan2(target_y - self.y, target_x - self.x)
                     self.angle += random.uniform(-math.pi / 10, math.pi / 10)
 
-        # --- 移动逻辑 ---
+        # ----- 移动逻辑 -----
         dx = self.speed * math.cos(self.angle)
         dy = self.speed * math.sin(self.angle)
 
@@ -300,7 +313,7 @@ class Rabbit(Animal):
         self.x = max(self.size[0], min(MapConfig.width - self.size[0], self.x))
         self.y = max(self.size[1], min(MapConfig.height - self.size[1], self.y))
 
-    def _find_predator(self, crocodiles: list[Crocodile], detection_radius: int) -> tuple[float, float] | None:
+    def _find_predator(self, crocodiles: list[Crocodile], detection_radius: int) -> Optional[tuple[float, float]]:
         """寻找最近的食肉动物 carnivore"""
         predators = []
         weights = []
@@ -309,7 +322,7 @@ class Rabbit(Animal):
         for other in crocodiles:
             distance = math.hypot(self.x - other.x, self.y - other.y)
             if distance < detection_radius:
-                weight = 1 / (distance**2 + ε)  # 越近权重越大
+                weight = 1 / (distance ** 2 + ε)  # 越近权重越大
                 predators.append((other.x, other.y, weight))
                 weights.append(weight)
 
@@ -325,12 +338,14 @@ class Rabbit(Animal):
     def _boundary_force(self, pos: float, min_val: int, max_val: int) -> float:
         """计算边界力"""
         if pos < min_val:
-            return (min_val - pos)**2 / self.margin**2
+            return (min_val - pos) ** 2 / self.margin ** 2
         elif pos > max_val:
-            return -(pos - max_val)**2 / self.margin**2
+            return -(pos - max_val) ** 2 / self.margin ** 2
         return 0.0
 
-    def _find_plant(self, plants: list[Plant]) -> tuple[list[tuple[float, float, float]], list[tuple[float, float, float]]]:
+    def _find_plant(
+            self, plants: list[Plant]
+    ) -> tuple[list[tuple[float, float, float]], list[tuple[float, float, float]]]:
         """寻找最近的草和治愈药草"""
         all_plants, healing_plants = [], []
 

@@ -1,5 +1,10 @@
-# season.py
-"""游戏季节和天气系统"""
+"""
+season.py
+
+功能: 游戏季节和天气系统
+时间: 2025/11/07
+版本: 1.0
+"""
 
 import math
 import random
@@ -13,7 +18,7 @@ class Season:
     """管理四季更替、不定时降雨"""
 
     config = None
-    SEASONS = ('春天', '夏天', '秋天', '冬天')
+    SEASONS = ("春天", "夏天", "秋天", "冬天")
     COLORS = {"春天": color.LIGHT_GREEN, "夏天": color.LIGHT_YELLOW, "秋天": color.LIGHT_ORANGE, "冬天": color.PALE_BLUE}
 
     def __init__(self, position: tuple[int, int] = (370, 20), font_name: str = "SimSun", font_size: int = 20):
@@ -96,16 +101,19 @@ class Season:
         self.rain_duration_timer = 0
         self.rain_duration = self.get_rain_duration()
         self.raindrops = [
-            {"x": random.randint(0, MapConfig.width), "y": random.randint(-200, 0), "speed": random.randint(5, 12)}
+            {
+                "x": random.randint(0, MapConfig.width),
+                "y": random.randint(-200, 0),
+                "speed": random.randint(5, 12)}
             for _ in range(150)
         ]
-        sound_manager.sound_dict['rain'].play(-1)
+        sound_manager.sound_dict["rain"].play(-1)
 
     def stop_rain(self) -> None:
         """结束降雨"""
         self.is_raining = False
         self.raindrops.clear()
-        sound_manager.sound_dict['rain'].stop()
+        sound_manager.sound_dict["rain"].stop()
 
     def update_raindrops(self) -> None:
         """更新雨滴"""
@@ -138,7 +146,10 @@ class Season:
         # 绘制雨滴效果
         if self.is_raining:
             for drop in self.raindrops:
-                pygame.draw.line(screen, (100, 100, 255), (drop["x"], drop["y"]), (drop["x"], drop["y"] + 5), 3)
+                pygame.draw.line(
+                    screen, (100, 100, 255), (drop["x"], drop["y"]),
+                    (drop["x"], drop["y"] + 5), 3
+                )
 
     def change_to(self, target_season: str) -> None:
         """切换季节"""
@@ -159,16 +170,16 @@ class Season:
     def get_color(self) -> tuple[int, int, int]:
         """获取背景颜色"""
         return self.color
-    
-    def lerp_color(self, c1: tuple[int, int, int], c2: tuple[int, int, int], t: float) -> tuple[int, int, int]:
+
+    @staticmethod
+    def lerp_color(c1: tuple[int, int, int], c2: tuple[int, int, int], t: float) -> tuple[int, ...]:
         """计算过渡颜色"""
         return tuple(int(c1[i] + (c2[i] - c1[i]) * t) for i in range(3))
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     import matplotlib.pyplot as plt
     from collections import Counter
-
 
     num = 10000
     season = Season()
@@ -185,11 +196,11 @@ if __name__ == '__main__':
 
     # 绘制柱状图
     plt.figure(figsize=(10, 5))
-    plt.bar(seconds, counts, width=0.8, color='skyblue', edgecolor='black')
-    plt.title(f'Rain Duration Distribution over {num} samples')
-    plt.xlabel('Duration (s)')
-    plt.ylabel('Frequency')
-    plt.xticks(seconds)  # 逐个显示刻度
-    plt.grid(axis='y', linestyle='--', alpha=0.7)
+    plt.bar(seconds, counts, width=0.8, color="skyblue", edgecolor="black")
+    plt.title(f"Rain Duration Distribution over {num} samples")
+    plt.xlabel("Duration (s)")
+    plt.ylabel("Frequency")
+    plt.xticks(seconds)
+    plt.grid(axis="y", linestyle="--", alpha=0.7)
     plt.tight_layout()
     plt.show()

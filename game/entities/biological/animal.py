@@ -1,5 +1,10 @@
-# animal.py
-"""创建和管理动物实体"""
+"""
+animal.py
+
+功能: 创建和管理动物实体
+时间: 2025/11/07
+版本: 1.0
+"""
 
 from __future__ import annotations
 from typing import Optional
@@ -95,8 +100,10 @@ class Animal:
         return animals
 
     @classmethod
-    def add_new_animal(cls, animals: list[Animal], config: AnimalConfig, all_animals: list[Animal],
-                       resource_manager: ResourceManager, season: Season) -> Animal:
+    def add_new_animal(
+            cls, animals: list[Animal], config: AnimalConfig, all_animals: list[Animal],
+            resource_manager: ResourceManager, season: Season
+    ) -> Animal:
         """动物繁殖"""
         new_animals = []
         target_eaten = config.reproduction_threshold[season.current]
@@ -115,7 +122,8 @@ class Animal:
                         new_animals.append(new_animal)
                         resource_manager.gain_animite(config.reproduction_resource)
                         break
-        return new_animals
+
+        return new_animals[0]
 
     @classmethod
     def boost_speed(cls, config: AnimalConfig) -> None:

@@ -1,5 +1,10 @@
-# disaster.py
-"""游戏灾害系统"""
+"""
+disaster.py
+
+功能: 游戏灾害系统
+时间: 2025/11/07
+版本: 1.0
+"""
 
 from __future__ import annotations
 from typing import TYPE_CHECKING
@@ -159,7 +164,7 @@ class DisasterManager:
         # 阶段三：淡出
         else:
             fade_elapsed = self.active_draw_time - (self.draw_duration + self.hold_duration)
-            fade_ratio = max(0, 1 - fade_elapsed / self.fadeout_duration)
+            fade_ratio = max(0.0, 1 - fade_elapsed / self.fadeout_duration)
             alpha = int(255 * fade_ratio)
 
         # 绘制半透明白框

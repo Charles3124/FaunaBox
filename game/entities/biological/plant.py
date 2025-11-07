@@ -1,5 +1,10 @@
-# plant.py
-"""创建和管理植物实体"""
+"""
+plant.py
+
+功能: 创建和管理植物实体
+时间: 2025/11/07
+版本: 1.0
+"""
 
 from __future__ import annotations
 from typing import TYPE_CHECKING
@@ -59,8 +64,8 @@ class Plant:
     def _is_too_close_p(new_plant: Plant, plants: list[Plant]) -> bool:
         """控制植物距离"""
         for plant in plants:
-            distance = (new_plant.x - plant.x)**2 + (new_plant.y - plant.y)**2
-            if distance < Plant.config.min_distance**2:
+            distance = (new_plant.x - plant.x) ** 2 + (new_plant.y - plant.y) ** 2
+            if distance < Plant.config.min_distance ** 2:
                 return True
         return False
 
@@ -84,9 +89,11 @@ class Plant:
         return plants
 
     @classmethod
-    def add_new_plant(cls, plants: list[Plant],
-                      season: Season, resource_manager: ResourceManager,
-                      time_speed: int, pause: bool) -> None:
+    def add_new_plant(
+            cls, plants: list[Plant],
+            season: Season, resource_manager: ResourceManager,
+            time_speed: int, pause: bool
+    ) -> None:
         """植物繁殖"""
         # 如果还有植物，则植物可以繁衍
         if len(plants) != 0:
@@ -149,9 +156,11 @@ class Plant:
                             break
 
     @classmethod
-    def remove_plants_near_animals(cls, plants: list[Plant], animals: list[Rabbit],
-                                   season: Season, resource_manager: ResourceManager,
-                                   time_speed: int, pause: bool) -> None:
+    def remove_plants_near_animals(
+            cls, plants: list[Plant], animals: list[Rabbit],
+            season: Season, resource_manager: ResourceManager,
+            time_speed: int, pause: bool
+    ) -> None:
         """移除植物"""
         # 活跃时间检查
         now = pygame.time.get_ticks()
@@ -198,9 +207,9 @@ class Plant:
     def _is_too_close_a(plant: Plant, animals: list[Rabbit]) -> Rabbit | None:
         """判断是否被吃"""
         for animal in animals:
-            if getattr(animal, 'herbivore', False):
-                distance = (plant.x - animal.x)**2 + (plant.y - animal.y)**2
-                if distance < Plant.config.min_animal_distance**2:
+            if getattr(animal, "herbivore", False):
+                distance = (plant.x - animal.x) ** 2 + (plant.y - animal.y) ** 2
+                if distance < Plant.config.min_animal_distance ** 2:
                     return animal
         return None
 
@@ -211,6 +220,7 @@ class Plant:
 
     @classmethod
     def _update_state(cls, state: str, delta_time: int) -> bool:
+        """更新状态"""
         if getattr(cls.config, state, False) and cls.states[state] > 0:
             cls.states[state] -= delta_time
             return True

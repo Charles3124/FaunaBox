@@ -1,5 +1,10 @@
-# item.py
-"""游戏道具系统"""
+"""
+item.py
+
+功能: 游戏道具系统
+时间: 2025/11/07
+版本: 1.0
+"""
 
 from __future__ import annotations
 from typing import Callable, TYPE_CHECKING
@@ -33,7 +38,7 @@ class Item:
 class CraftingSystem:
     """管理道具的生效效果、制作状态及其使用"""
 
-    RESOUCE_NAME = {'leafium': '绿素', 'animite': '兽能', 'ecopoint': '生态点'}
+    RESOUCE_NAME = {"leafium": "绿素", "animite": "兽能", "ecopoint": "生态点"}
 
     def __init__(self, world: World, width: int, height: int):
         self.width = width
@@ -42,8 +47,8 @@ class CraftingSystem:
         self.world = world
         self.resource_manager = world.resource_manager
 
-        self.font = get_font("SimSun", 16)
-        self.name_font = get_font("SimSun", 16)
+        self.font = get_font(name="SimSun", size=16)
+        self.name_font = get_font(name="SimSun", size=16)
 
         self.items = []                        # 所有道具
         self.buttons = []                      # 所有按钮（仅创建一次）
@@ -86,10 +91,22 @@ class CraftingSystem:
             Plant.states["is_invincible"] += config.invincible_duration
 
         # 添加道具
-        self.items.append(Item("治愈药草", ITEM_PATH / 'heal.png', {'leafium': 10}, 10000, use_heal))
-        self.items.append(Item("加速鳄鱼", ITEM_PATH / 'croc.png', {'animite': 10}, 10000, use_speed))
-        self.items.append(Item("人工降雨", ITEM_PATH / 'rain.png', {'ecopoint': 10}, 10000, use_rain))
-        self.items.append(Item("植物护盾", ITEM_PATH / 'invincible.png', {'leafium': 10}, 10000, use_invincible))
+        self.items.append(Item(
+            name="治愈药草", icon_path=ITEM_PATH / "heal.png",
+            cost={"leafium": 10}, craft_time=10000, use_func=use_heal)
+        )
+        self.items.append(Item(
+            name="加速鳄鱼", icon_path=ITEM_PATH / "croc.png",
+            cost={"animite": 10}, craft_time=10000, use_func=use_speed)
+        )
+        self.items.append(Item(
+            name="人工降雨", icon_path=ITEM_PATH / "rain.png",
+            cost={"ecopoint": 10}, craft_time=10000, use_func=use_rain)
+        )
+        self.items.append(Item(
+            name="植物护盾", icon_path=ITEM_PATH / "invincible.png",
+            cost={"leafium": 10}, craft_time=10000, use_func=use_invincible)
+        )
 
         # 为每个道具分配两个按钮（制作 + 使用）
         x_start = 160
@@ -102,12 +119,16 @@ class CraftingSystem:
             y = y_start
 
             # 创建制作按钮
-            item.btn_craft = Button((x + 10, y + 115, 60, 28), text="制作", on_click=lambda i=item: self.try_craft(i),
-                                    color_idle=(100, 180, 100), color_hover=(70, 160, 70), font_size=18)
+            item.btn_craft = Button(
+                rect_info=(x + 10, y + 115, 60, 28), text="制作", on_click=lambda i=item: self.try_craft(i),
+                color_idle=(100, 180, 100), color_hover=(70, 160, 70), font_size=18
+            )
 
             # 创建使用按钮
-            item.btn_use = Button((x + 80, y + 115, 60, 28), text="使用", on_click=lambda i=item: self.try_use(i),
-                                  color_idle=(180, 100, 100), color_hover=(160, 70, 70), font_size=18)
+            item.btn_use = Button(
+                rect_info=(x + 80, y + 115, 60, 28), text="使用", on_click=lambda i=item: self.try_use(i),
+                color_idle=(180, 100, 100), color_hover=(160, 70, 70), font_size=18
+            )
 
             # 加入按钮管理列表
             self.buttons.extend([item.btn_craft, item.btn_use])

@@ -1,5 +1,10 @@
-# building.py
-"""游戏建筑系统"""
+"""
+building.py
+
+功能: 游戏建筑系统
+时间: 2025/11/07
+版本: 1.0
+"""
 
 import pygame
 

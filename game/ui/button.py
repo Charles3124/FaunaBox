@@ -1,5 +1,10 @@
-# button.py
-"""游戏 UI 系统"""
+"""
+button.py
+
+功能: 游戏 UI 系统
+时间: 2025/11/07
+版本: 1.0
+"""
 
 from __future__ import annotations
 from typing import Optional, Callable, TYPE_CHECKING
@@ -16,12 +21,14 @@ if TYPE_CHECKING:
 class Button:
     """管理按钮的创建、鼠标事件"""
     
-    def __init__(self, rect_info: tuple[int, int, int, int], on_click: Optional[Callable] = None, text: Optional[str] = None,
-                 tooltip_text: Optional[str] = None, tooltip_offset: Optional[tuple[int, int]] = None,
-                 font_size: int = 20, font_name: str = "SimSun", display: bool = True,
-                 color_idle: tuple[int, int, int] = color.LIGHT_SLATE_GRAY,
-                 color_hover: tuple[int, int, int] = color.DIM_GRAY,
-                 text_color: tuple[int, int, int] = color.WHITE):
+    def __init__(
+            self, rect_info: tuple[int, int, int, int], on_click: Optional[Callable] = None, text: Optional[str] = None,
+            tooltip_text: Optional[str] = None, tooltip_offset: Optional[tuple[int, int]] = None,
+            font_size: int = 20, font_name: str = "SimSun", display: bool = True,
+            color_idle: tuple[int, int, int] = color.LIGHT_SLATE_GRAY,
+            color_hover: tuple[int, int, int] = color.DIM_GRAY,
+            text_color: tuple[int, int, int] = color.WHITE
+    ):
         self.rect = pygame.Rect(rect_info)      # 创建矩形
         self.display = display                  # 显示状态
         self.text = text                        # 按钮文字
@@ -59,7 +66,13 @@ class Button:
 
         # 设置文字透明度
         text_surface.set_alpha(self.alpha)
-        screen.blit(text_surface, (self.rect.centerx - text_surface.get_width() // 2, self.rect.centery - text_surface.get_height() // 2))
+        screen.blit(
+            text_surface,
+            (
+                self.rect.centerx - text_surface.get_width() // 2,
+                self.rect.centery - text_surface.get_height() // 2
+            )
+        )
 
         # 显示提示框
         if self.hovered and self.tooltip_text:
@@ -95,7 +108,7 @@ class Button:
 
         elif event.type == pygame.MOUSEBUTTONDOWN:
             if self.rect.collidepoint(event.pos) and self.on_click is not None:
-                sound_manager.sound_dict['click_settings1'].play()
+                sound_manager.sound_dict["click_settings1"].play()
                 self.on_click()
 
 
@@ -133,37 +146,39 @@ def toggle_guide(world: World) -> None:
     world.guide_visible = not world.guide_visible
 
 
-def create_ui_buttons(world: World, width: int, height: int, set_buttons: Callable[[list[Button]], None]) -> list[Button]:
+def create_ui_buttons(
+        world: World, width: int, height: int, set_buttons: Callable[[list[Button]], None]
+) -> list[Button]:
     """创建按钮"""
     return [
-        Button((270, 15, 60, 30),
+        Button(rect_info=(270, 15, 60, 30),
                on_click=lambda: set_buttons(restart(world, width, height, set_buttons)),
                text="重置",
                tooltip_text="重置整个生态箱"),
 
-        Button((190, 15, 60, 30),
+        Button(rect_info=(190, 15, 60, 30),
                on_click=lambda: toggle_pause(world),
                text="暂停",
                tooltip_text="暂停或继续"),
 
-        Button((130, 15, 45, 30),
+        Button(rect_info=(130, 15, 45, 30),
                on_click=lambda: world.clock.change_speed(),
                text=lambda: f"{world.clock.speed}x",
                tooltip_text="切换倍速"),
 
-        Button((width - 100, 15, 80, 30),
+        Button(rect_info=(width - 100, 15, 80, 30),
                on_click=lambda: toggle_tech(world),
                text="科技树",
                tooltip_text="强化你的科技！",
                tooltip_offset=(-150, 0)),
 
-        Button((20, height - 50, 120, 30),
+        Button(rect_info=(20, height - 50, 120, 30),
                on_click=world.crafting_system.toggle_visible,
                text="道具制作",
                tooltip_text="制作你的道具！",
                tooltip_offset=(0, -30)),
 
-        Button((width - 100, height - 50, 80, 30),
+        Button(rect_info=(width - 100, height - 50, 80, 30),
                on_click=lambda: toggle_guide(world),
                text="指南",
                tooltip_text="查看游戏指南",

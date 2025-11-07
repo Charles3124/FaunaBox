@@ -1,5 +1,10 @@
-# sounds.py
-"""游戏声音系统"""
+"""
+sounds.py
+
+功能: 游戏声音系统
+时间: 2025/11/07
+版本: 1.0
+"""
 
 import os
 import random
@@ -19,7 +24,8 @@ class SoundManager:
         self.bgms_num = len(self.bgms)
         self.set_volume()
 
-    def load_all_sounds(self, sound_folder: str) -> dict[str, pygame.mixer.Sound]:
+    @staticmethod
+    def load_all_sounds(sound_folder: str) -> dict[str, pygame.mixer.Sound]:
         """递归加载所有 .ogg、.wav、.mp3 音效文件"""
         sounds = {}
         for root, _, files in os.walk(sound_folder):
@@ -35,9 +41,9 @@ class SoundManager:
 
     def set_volume(self) -> None:
         """调整音量大小"""
-        self.sound_dict['click_settings1'].set_volume(0.8)
-        self.sound_dict['click_tech'].set_volume(0.2)
-        self.sound_dict['rain'].set_volume(0.5)
+        self.sound_dict["click_settings1"].set_volume(0.8)
+        self.sound_dict["click_tech"].set_volume(0.2)
+        self.sound_dict["rain"].set_volume(0.5)
 
     def play_random_bgm(self) -> None:
         """播放随机音乐"""
@@ -47,7 +53,7 @@ class SoundManager:
 
     def stop_all_bgm(self) -> None:
         """停止所有音乐"""
-        self.sound_dict['rain'].stop()
+        self.sound_dict["rain"].stop()
         if self.bgms_num > 0:
             for bgm in self.bgms:
                 self.sound_dict[bgm].stop()

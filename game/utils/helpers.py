@@ -1,5 +1,10 @@
-# helpers.py
-"""游戏文字绘制"""
+"""
+helpers.py
+
+功能: 游戏文字绘制
+时间: 2025/11/07
+版本: 1.0
+"""
 
 from __future__ import annotations
 from typing import TYPE_CHECKING
@@ -17,7 +22,7 @@ if TYPE_CHECKING:
 def draw_centered_text(screen: pygame.surface.Surface, clock: Clock, text: str, y_offset: int = 0,
                        text_color: tuple[int, int, int] = color.BLACK, font_name: str = "SimSun") -> None:
     """绘制游戏结局"""
-    font = get_font(font_name, 32)
+    font = get_font(name=font_name, size=32)
     text_surface = font.render(text, True, text_color)
 
     x = (MapConfig.width - text_surface.get_width()) // 2
@@ -25,8 +30,8 @@ def draw_centered_text(screen: pygame.surface.Surface, clock: Clock, text: str, 
 
     screen.blit(text_surface, (x, y))
 
-    font = get_font(font_name, 22)
-    text_surface = font.render(f'生态箱持续到了 {clock.years} 年 {clock.months} 月', True, text_color)
+    font = get_font(name=font_name, size=22)
+    text_surface = font.render(f"生态箱持续到了 {clock.years} 年 {clock.months} 月", True, text_color)
 
     x = (MapConfig.width - text_surface.get_width()) // 2
     y = (MapConfig.height - text_surface.get_height()) // 2 + y_offset + 60
@@ -48,12 +53,12 @@ def draw_guide(screen: pygame.surface.Surface) -> None:
     pygame.draw.rect(screen, color.BLACK, guide_rect, 2, border_radius=10)
     
     # 标题
-    title_font = get_font("SimHei", 30)
+    title_font = get_font(name="SimHei", size=30)
     title = title_font.render("游戏指南", True, color.BLACK)
     screen.blit(title, (guide_rect.centerx - title.get_width() // 2, guide_rect.top + 20))
     
     # 内容
-    content_font = get_font("SimSun", 18)
+    content_font = get_font(name="SimSun", size=18)
     guide_text = [
         "",
         "欢迎来到生态箱游戏！这是一个模拟生态系统的游戏，",
