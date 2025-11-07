@@ -1,0 +1,39 @@
+# color.py
+"""游戏颜色三原色元组"""
+
+# 标准颜色
+WHITE = (255, 255, 255)
+GREEN = (34, 177, 76)
+BROWN = (139, 69, 19)
+RED = (139, 0, 0)
+BLUE = (0, 0, 139)
+ORANGE = (255, 165, 0)
+BLACK = (0, 0, 0)
+GREY = (64, 64, 64)
+
+# 淡色
+LIGHT_BLUE = (173, 216, 230)
+LIGHT_RED = (255, 182, 193)
+LIGHT_GREY = (200, 200, 200)
+VERY_LIGHT_GREY = (220, 220, 220)
+
+# 深色
+DARK_BROWN = (101, 67, 33)
+DARK_GREEN = (0, 100, 0)
+
+# 特殊颜色
+FIRE_BRICK = (178, 34, 34)          # 砖红
+LIGHT_FIRE_BRICK = (220, 60, 60)    # 亮砖红
+ROYAL_BLUE = (65, 105, 225)         # 皇家蓝
+LIGHT_ROYAL_BLUE = (100, 140, 255)
+CORNFLOWER_BLUE = (100, 149, 237)
+
+# 四季颜色
+LIGHT_GREEN = (144, 238, 144)
+LIGHT_YELLOW = (255, 255, 153)
+LIGHT_ORANGE = (255, 204, 102)
+PALE_BLUE = (200, 225, 255)
+
+# 按钮颜色
+LIGHT_SLATE_GRAY = (119, 136, 153)
+DIM_GRAY = (105, 105, 105)
