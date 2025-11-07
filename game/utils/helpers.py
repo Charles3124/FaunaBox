@@ -19,8 +19,10 @@ if TYPE_CHECKING:
     from game.core import Clock
 
 
-def draw_centered_text(screen: pygame.surface.Surface, clock: Clock, text: str, y_offset: int = 0,
-                       text_color: tuple[int, int, int] = color.BLACK, font_name: str = "SimSun") -> None:
+def draw_centered_text(
+        screen: pygame.surface.Surface, clock: Clock, text: str, y_offset: int = -20,
+        text_color: tuple[int, int, int] = color.BLACK, font_name: str = "SimSun"
+) -> None:
     """绘制游戏结局"""
     font = get_font(name=font_name, size=32)
     text_surface = font.render(text, True, text_color)

@@ -83,16 +83,17 @@ while running:
 
     # 显示结局
     if world.ending1:
-        draw_centered_text(screen, world.clock, text="植物灭绝了！", y_offset=-20)
+        draw_centered_text(screen, world.clock, text="植物灭绝了！")
     elif world.ending2:
-        draw_centered_text(screen, world.clock, text="兔子灭绝了！", y_offset=-20)
+        draw_centered_text(screen, world.clock, text="兔子灭绝了！")
     elif world.ending3:
-        draw_centered_text(screen, world.clock, text="鳄鱼灭绝了！", y_offset=-20)
+        draw_centered_text(screen, world.clock, text="鳄鱼灭绝了！")
 
     # 更新一帧画面
     pygame.display.flip()
     pygame.time.Clock().tick(60)
 
 
+# ---------- 结束游戏 ----------
 sound_manager.stop_all_bgm()
 pygame.quit()
